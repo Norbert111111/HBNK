@@ -1,479 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>@electro-elites</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <link rel="stylesheet" href="style2.css" />
-  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBN -@electro-elites</title>
+    <link rel="stylesheet" href="style3.css">
+    
+    <!-- Importation Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
 </head>
 <body>
-   <!-- Version desktop -->
-   <div class="main-wrapper">
-      <h1 class="hide-on-mobile"style="color: #1408f4;">RESEAU 4.0 DE TRANSPORT ÉLECTRIQUE INTELLIGENT Basée Sur l'IoT et l'IA</h1>
-      <h2 class="hide-on-mobile"style="color: rgb(7, 15, 244);">               @HBNK.AGK                                                      </h2>
+    <div class="overlay">
+        <div class="content">
+            <!-- Section gauche --> 
+            <div class="left-section">
+                <h2>SYSTÈME DE NUMÉRISATION DU TRANSPORT ÉLECTRIQUE</h2>
+                <h1>LES ELECTRO-ELITES</h1>
+                <p>Bienvenue dans le système de numérisation du réseau de transport électrique en RDC conçu par <span class="highlight">@electro-elites</span>.</p>
+                <div class="buttons">
+                    <button class="btn-orange">Se connecter</button>
+                    <button class="btn-yellow">Check Data</button>
+                </div>
+            </div>
 
-  
-  <div class="image-container">
-   <img class="hide-on-mobile image-placeholder" src="images/logo1.jpg" alt="Logo1" style="height: 100px; width: 100px; border-radius: 50%; object-fit: cover;">
-
-    <h3 class="title-desktop" style="color: rgb(247, 121, 10); font-size: 22px; margin-top: 10px;">
-      <br>INTERFACE DE CONTRÔLE ET D'AFFICHAGE DES DONNÉES DU RESEAU </h3>
-
-    <img class="hide-on-mobile image-placeholder" src="images/logo1.jpg" alt="Logo1" style="height: 100px; width: 100px; border-radius: 50%; object-fit: cover;">
-
-  </div>
-  <!-- Version mobile uniquement -->
-      
-    <div class="title-mobile-wrapper">
-     <img src="images/logo1.jpg" alt="Logo1" class="image-placeholder" style="height: 100px;">
-       <div class="text-block">
-         <span>RESEAU DE TRANSPORT ELEC</span>
-        <span>4.0 INTELLIGENT</span>
-      </div>
-      <h5  style="color: #1408f4;">
+            <!-- Boîte de connexion -->
+            <div class="login-box">
+                <h3>Se connecter</h3>
+                <label for="username">NOM D'UTILISATEUR :</label>
+                <input type="text" id="username">
+                
+                <label for="password">MOT DE PASSE :</label>
+                <input type="password" id="password">
+                
+                <button class="btn-blue" onclick="login()">CONNEXION</button>
+            </div>
+        </div>
     </div>
-    <p class="mobile-only">INTERFACE DE CONTRÔLE</p>
-      
-   
-
-
-  <div class="table-wrapper">
-  <table>
-    <tr class="title-row">
-      <th style="color: rgb(12, 8, 244);"colspan="7">Les Données de la ligne</th>
-    </tr>
-    <tr>
-      <th style="color: blue;">Courant</th>
-      <th style="color: blue;">Tension</th>
-      <th style="color: blue;">Puissance</th>
-      <th style="color: blue;">PuissanceA</th>
-      <th style="color: blue;">Température</th>
-      <th style="color: blue;">Humidité</th>
-      <th style="color: blue;">Facteur de puissance (cosρ)</th>
-    </tr>
-    <tr>
-      <td id="COURANT"style="color: orange;">0</td>
-      <td id="DDP"style="color: orange;">0V</td>
-      <td id="PUISS"style="color: orange;">0W</td>
-      <td id="PUISSA"style="color: orange;">0VA</td>
-      <td id="TEMP"style="color: orange;">0°C</td>
-      <td id="HUM"style="color: orange;">0%</td>
-      <td id="Cos"style="color: orange;">0</td>
-    </tr>
-  </table>
-  </div>
-
-  
-  <h3 style="color: rgba(251, 123, 4, 0.988);">CONTROLE ET COMMANDE DE LIGNES DE DISTRIBUTION</h3>
-  
-  <section class="command-section">
-    <div class="station gombe">
-      <h4 style="color: rgb(74, 5, 249);">Départ GOMBE</h4>
-      <button class="activate" onclick="activerGombe()">Activer</button>
-      <button class="desactivate" onclick="desactiverGombe()">Désactiver</button>
-      <p><span id="etatGombe">En attente...</span></p>
-    </div>
-  
-    <div class="station limete">
-      <h4 style="color: rgb(52, 10, 241);">Départ LIMETE</h4>
-      <button class="activate" onclick="activerLimete()">Activer</button>
-      <button class="desactivate" onclick="desactiverLimete()">Désactiver</button>
-      <p><span id="etatLimete">En attente...</span></p>
-    </div>
-  
-    <div class="station barumbu">
-      <h4 style="color: rgb(53, 10, 245);">Départ BARUMBU</h4>
-      <button class="activate" onclick="activerBarumbu()">Activer</button>
-      <button class="desactivate" onclick="desactiverBarumbu()">Désactiver</button>
-      <p><span id="etatBarumbu">En attente...</span></p>
-    </div>
-
-    <div class="station tout">
-      <h4 style="color: rgb(57, 9, 248);">Tous Les Départs </h4>
-     <button id="btnActiverTout" class="activate" onclick="activertout()">Activer Tous les Départs</button>
-
-      <button class="desactivate" onclick="desactivertout()">Désactiver Tous Les Départs</button>
-      <p><span id="etatdéparts">En attente...</span></p>
-    </div>
-  </section>
-
-<!-- Barre de navigation fixe -->
-<div class="bottom-nav">
-  <div class="nav-item active" onclick="window.location.href='index2.html'">
-    <i class="fas fa-home"></i>
-  </div>
-  <div class="nav-item" onclick="window.location.href='HBNK.html'">
-    <i class="fas fa-sliders-h"></i>
-  </div>
-  <div class="nav-item" onclick="window.location.href='index3.html'">
-    <i class="fas fa-chart-line"></i>
-  </div>
-  <div class="nav-item" onclick="window.location.href='messages.html'">
-    <i class="fas fa-envelope"></i>
-  </div>
-  <div class="nav-item" onclick="window.location.href='profil.html'">
-    <i class="fas fa-user"></i>
-  </div>
-</div>
-
-
-
-  <script>
-    parler("Bienvenue; à l'interface de controle et de commande du reseau electrique intelligent en R,D,C . ");
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyArEB0lH1tz3OOvrgKzL0cypYfMpQVgPm0",
-      authDomain: "maison-iot-b0dd6.firebaseapp.com",
-      databaseURL: "https://maison-iot-b0dd6-default-rtdb.firebaseio.com",
-      projectId: "maison-iot-b0dd6",
-      storageBucket: "maison-iot-b0dd6.appspot.com",
-      messagingSenderId: "838021465845",
-      appId: "1:838021465845:web:b277f02fd883b0c23627bc",
-      measurementId: "G-P697GH67M1"
-    };
-  
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-  
-    let Tension = 0;
-    let Courant = 0;
-  
-    // Mise à jour des données capteurs
-    database.ref("Data/Temperature").on("value", (snapshot) => {
-      document.getElementById("TEMP").textContent = snapshot.val() + " °C";
-    });
-  
-    database.ref("Data/hymidite").on("value", (snapshot) => {
-      document.getElementById("HUM").textContent = snapshot.val() + " %";
-    });
-  
-    database.ref("Data/Tension").on("value", (snapshot) => {
-      Tension = snapshot.val();
-      document.getElementById("DDP").textContent = Tension + " V";
-      updatePower();
-    });
-  
-    database.ref("Data/Courant").on("value", (snapshot) => {
-      Courant = snapshot.val();
-      document.getElementById("COURANT").textContent = Courant + " A";
-      updatePower();
-    });
-  
-    function updatePower() {
-      const F = 0.9;
-      const puissance = Tension * Courant * F;
-      const puissanceA = Tension * Courant;
-  
-      document.getElementById("PUISS").textContent = puissance.toFixed(2) + " W";
-      document.getElementById("PUISSA").textContent = puissanceA.toFixed(2) + " VA";
-      document.getElementById("Cos").textContent = F;
-  
-      database.ref("Data/puissance").set(puissance);
-      database.ref("Data/puissanceA").set(puissanceA);
-    }
-      let modeSilencieux = false; // Pour contrôler si on doit parler ou non
-// Fonction de synthèse vocale
-function parler(message) {
-  const utterance = new SpeechSynthesisUtterance(message);
-  utterance.lang = "fr-FR"; // Français
-  speechSynthesis.speak(utterance);
-}
-
-    // Fonction pour activer visuellement une station
-function activerStation(station) {
-  const activateBtn = document.querySelector(`.station.${station} .activate`);
-  activateBtn.classList.add("active");
-}
-
-// Fonction pour désactiver visuellement une station
-function desactiverStation(station) {
-  const activateBtn = document.querySelector(`.station.${station} .activate`);
-  activateBtn.classList.remove("active");
-}
-
-// Fonctions pour chaque départ
-function activerGombe() {
-  database.ref("Depars/Depart_GOMBE").set(1); // valeurs numériques
-  activerStation("gombe");
-  if (!modeSilencieux)parler("Le départ pour la commune de la Gombé ; est activé ");
-}
-
-function desactiverGombe() {
-  database.ref("Depars/Depart_GOMBE").set(0);
-  desactiverStation("gombe");
-  if (!modeSilencieux)parler("Le départ pour la commune de la Gombé ; est désactivé ");
-}
-
-database.ref("Depars/Depart_GOMBE").on("value", (snapshot) => {
-  const etat = snapshot.val();
-  const etatGombeElem = document.getElementById("etatGombe");
-  const activateBtn = document.querySelector(".station.gombe .activate");
-  
-  etatGombeElem.textContent = (etat == 1) ? "GOMBE est Activé" : "GOMBE est Désactivé";
-  etatGombeElem.style.color = (etat == 1) ? "blue" : "red"; // couleur du texte
-  // ou pour changer la couleur de fond à la place :
-  // etatGombeElem.style.backgroundColor = (etat == 1) ? "yellow" : "green";
-  
-  if (etat == 1) {
-    activateBtn.classList.add("active");
-  } else {
-    activateBtn.classList.remove("active");
-  }
-
-  verifierEtatGlobal();
-});
-
-function activerLimete() {
-  database.ref("Depars/Depart_LIMETE").set(1);
-  activerStation("limete");
-  if (!modeSilencieux)parler("Le départ pour la commune de LIMETé ; est activé ");
-}
-
-function desactiverLimete() {
-  database.ref("Depars/Depart_LIMETE").set(0);
-  desactiverStation("limete");
-  if (!modeSilencieux)parler("Le départ pour la commune de LIMETé ; est désactivé ");
-}
-
-database.ref("Depars/Depart_LIMETE").on("value", (snapshot) => {
-  const etat = snapshot.val();
-  const etatLimeteElem = document.getElementById("etatLimete");
-  const activateBtn = document.querySelector(".station.limete .activate");
-
-  etatLimeteElem.textContent = (etat == 1) ? "LIMETE est Activé" : "LIMETE est Désactivé";
-  etatLimeteElem.style.color = (etat == 1) ? "blue" : "red"; // couleur du texte
-
-  if (etat == 1) {
-    activateBtn.classList.add("active");
-  } else {
-    activateBtn.classList.remove("active");
-  }
-  verifierEtatGlobal();
-});
-
-function activerBarumbu() {
-  database.ref("Depars/Depart_BARUMBU").set(1);
-  activerStation("barumbu");
-  if (!modeSilencieux)parler("Le départ pour la commune de la BARùMBù ; est activé ");
-}
-
-function desactiverBarumbu() {
-  database.ref("Depars/Depart_BARUMBU").set(0);
-  desactiverStation("barumbu");
-  if (!modeSilencieux)parler("Le départ pour la commune de la BARùMBù ; est désactivé ");
-}
-
-database.ref("Depars/Depart_BARUMBU").on("value", (snapshot) => {
-  const etat = snapshot.val();
-  const etatBarumbuElem = document.getElementById("etatBarumbu");
-  const activateBtn = document.querySelector(".station.barumbu .activate");
-
-  etatBarumbuElem.textContent = (etat == 1) ? "BARUMBU est Activé" : "BARUMBU est Désactivé";
-  etatBarumbuElem.style.color = (etat == 1) ? "blue" : "red"; // couleur du texte
-
-  if (etat == 1) {
-    activateBtn.classList.add("active");
-  } else {
-    activateBtn.classList.remove("active");
-  }
-  verifierEtatGlobal();
-});
-
-// Activer tous les départs
-function activertout() {
-  modeSilencieux = true;
-  activerGombe();
-  activerLimete();
-  activerBarumbu();
-  modeSilencieux = false;
-
-  database.ref("Depars/Depart_TOUT").set(1);
-  
-
-  document.querySelectorAll("button.activate").forEach(btn => {
-    btn.classList.add("active");
-    
-  });
-  // Parler lorsque tous les départs sont activés
-  parler("Tous les départs sont activés");
-}
-
-// Désactiver tous les départs
-function desactivertout() {
-   modeSilencieux = true;
-  desactiverGombe();
-  desactiverLimete();
-  desactiverBarumbu();
-   modeSilencieux = false;
-
-  database.ref("Depars/Depart_TOUT").set(0);
-  
-
-  document.querySelectorAll("button.activate").forEach(btn => {
-    btn.classList.remove("active");
-  });
-   // Parler lorsque tous les départs sont activés
-  parler("Tous les départs sont désactivés");
-}
-
-// Vérification de l'état global de tous les départs
-function verifierEtatGlobal() {
-  database.ref("Depars").once("value").then((snapshot) => {
-    const data = snapshot.val();
-    const gombe = data.Depart_GOMBE;
-    const limete = data.Depart_LIMETE;
-    const barumbu = data.Depart_BARUMBU;
-    const tout = data.Depart_TOUT;
-
-    const etatGlobalElem = document.getElementById("etatdéparts");
-    const btnActiverTout = document.getElementById("btnActiverTout");
-
-    let texteGlobal = "";
-
-  if (gombe == 1 && limete == 1 && barumbu == 1) {
-    
-  texteGlobal = "Tous les Départs sont Activés";
-  etatGlobalElem.style.color = "blue";
-  // rendre le bouton "Activer tout" jaune (classe active)
-  btnActiverTout.classList.add("active");
-  
-  
-
-} else if (gombe == 0 && limete == 0 && barumbu == 0) {
-  texteGlobal = "Tous les Départs sont Désactivés";
-  etatGlobalElem.style.color = "red";
-  // retirer la classe "active" => vert par défaut
- btnActiverTout.classList.remove("active");
-
-  }
-else {
-  texteGlobal = "Tous les Départs ne sont pas Activés";
-  etatGlobalElem.style.color = "green";
-  btnActiverTout.classList.remove("active");
-  //parler("Tous les départs des communes; ne sont Activés  ");
-}
-
-   etatGlobalElem.textContent = texteGlobal;
-  });
-}
-
-// Rendre les fonctions accessibles globalement
-window.activerGombe = activerGombe;
-window.desactiverGombe = desactiverGombe;
-window.activerLimete = activerLimete;
-window.desactiverLimete = desactiverLimete;
-window.activerBarumbu = activerBarumbu;
-window.desactiverBarumbu = desactiverBarumbu;
-window.activertout = activertout;
-window.desactivertout = desactivertout;
-
-// Fonction pour annoncer périodiquement l'état de tous les départs
-function annoncerEtats() {
-  if (modeSilencieux) return; // Ne pas parler si le mode silencieux est activé
-
-  database.ref("Depars").once("value").then((snapshot) => {
-    const data = snapshot.val();
-
-    const activés = [];
-    const désactivés = [];
-
-    if (data.Depart_GOMBE == 1) {
-      activés.push("la commune de la Gombé");
-    } else {
-      désactivés.push("la commune de la Gombé");
-    }
-
-    if (data.Depart_LIMETE == 1) {
-      activés.push("la commune de Limeté");
-    } else {
-      désactivés.push("la commune de Limeté");
-    }
-
-    if (data.Depart_BARUMBU == 1) {
-      activés.push("la commune de Barumbu");
-    } else {
-      désactivés.push("la commune de Barumbu");
-    }
-
-    // Annonce des états
-    if (activés.length === 3) {
-      parler("Tous les départs sont actuellement activés.");
-    } else if (désactivés.length === 3) {
-      parler("Tous les départs sont actuellement désactivés.");
-    } else {
-      if (activés.length > 0) {
-        parler("Les départs activés sont : " + activés.join(", et ") + " seulement.");
-      }
-      if (désactivés.length > 0) {
-        parler("Les départs désactivés sont : " + désactivés.join(", et ") + " seulement.");
-      }
-    }
-
-    // Ensuite, annoncer les mesures et la prédiction
-    annoncerMesuresEtPrediction();
-  });
-}
-
-// Fonction pour annoncer les mesures + prédiction
-function annoncerMesuresEtPrediction() {
-  const courant = parseFloat(document.getElementById("COURANT").textContent); // ex: 5A
-  const tension = parseFloat(document.getElementById("DDP").textContent);
-  const puissance = parseFloat(document.getElementById("PUISS").textContent);
-  const puissanceApparente = parseFloat(document.getElementById("PUISSA").textContent);
-  const temperature = parseFloat(document.getElementById("TEMP").textContent);
-  const humidite = parseFloat(document.getElementById("HUM").textContent);
-  const cosPhi = parseFloat(document.getElementById("Cos").textContent);
-
-  // Lecture vocale des mesures
-  const texteMesures =
-  "Voici les mesures actuelles et la prediction de l'état du système : " +
-  `Le courant est de ${courant} empère${courant > 1 ? "s" : ""}, ` +
-  `la tension est de ${tension} volt${tension > 1 ? "s" : ""}, ` +
-  `la puissance est de ${puissance} watt${puissance > 1 ? "s" : ""}, ` +
-  `la puissance apparente est de ${puissanceApparente} volt-ampère${puissanceApparente > 1 ? "s" : ""}, ` +
-  `la température est de ${temperature} dégré${temperature > 1 ? "s" : ""} Celsius, ` +
-  `l'humidité est de ${humidite} pour cent, ` +
-  `et le facteur de puissance est de ${cosPhi}.`;
-
-  parler(texteMesures);
-
-  // Analyse simple pour prédiction
-  const estNormal =
-    courant >= 0 && courant <= 30 &&
-    tension >= 200 && tension <= 250 &&
-    temperature >= 10 && temperature <= 45 &&
-    humidite >= 10 && humidite <= 80 &&
-    cosPhi >= 0.7 && cosPhi <= 1.0;
-
-  if (estNormal) {
-    parler("Après l'analyse de données, la prédiction montre que le fonctionnement est normal.");
-  } else {
-    parler("Attention.; Selon la prediction ; des anomalies ont été détectées Apres l'analyse de données .");
-  }
-}
-
-// Fonction pour faire parler le système
-function parler(message) {
-  const synthese = window.speechSynthesis;
-  const voix = new SpeechSynthesisUtterance(message);
-  voix.lang = "fr-FR";
-  synthese.speak(voix);
-}
-
-// Exécuter toutes les 2 minutes
-setInterval(annoncerEtats, 60000); // 2 minutes
- 
-
-
-
-
 
 
     
-  </script>
+
+    <script>
+        parler("Connecté-vous au reseau,electrique,intelligent(4.0),en R,D,C ");
+    let modeSilencieux = false; // Pour contrôler si on doit parler ou non
+    // Fonction de synthèse vocale
+        function parler(message) {
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.lang = "fr-FR"; // Français
+        speechSynthesis.speak(utterance);
+}
+
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyArEB0lH1tz3OOvrgKzL0cypYfMpQVgPm0",
+            authDomain: "maison-iot-b0dd6.firebaseapp.com",
+            databaseURL: "https://maison-iot-b0dd6-default-rtdb.firebaseio.com",
+            projectId: "maison-iot-b0dd6",
+            storageBucket: "maison-iot-b0dd6.appspot.com", // Correction ici
+            messagingSenderId: "838021465845",
+            appId: "1:838021465845:web:b277f02fd883b0c23627bc",
+            measurementId: "G-P697GH67M1"
+        };
+
+        // Initialisation de Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Fonction de connexion
+        function login() {
+            var username = document.getElementById("username").value.trim();
+            var password = document.getElementById("password").value.trim();
+
+            if (username === "" || password === "") {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            var userRef = database.ref("users/" + username);
+
+            userRef.get().then((snapshot) => {
+                if (snapshot.exists()) {
+                    var storedPassword = snapshot.val().password;
+                    if (storedPassword === password) {
+                        window.location.href = "HBNK.html";
+                        document.getElementById("username").value="";
+                        document.getElementById("password").value="";
+                    } else {
+                        alert("Mot de passe incorrect.");
+                        document.getElementById("username").value="";
+                        document.getElementById("password").value="";
+                    }
+                } else {
+                    alert("Nom d'utilisateur non trouvé.");
+                    document.getElementById("username").value="";
+                        document.getElementById("password").value="";
+                }
+            }).catch((error) => {
+                console.error("Erreur Firebase:", error);
+            });
+        }
+    </script>
 </body>
-</html>  
+</html>
