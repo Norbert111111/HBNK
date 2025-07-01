@@ -1,0 +1,336 @@
+
+
+
+/* ===== Par défaut (PC) ===== */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  background: #eae4e4;
+  /* background: url('images/logo16.jpFg') no-repeat center center/cover; */
+  overflow-x: hidden;
+}
+
+/* ===== Sur mobile (≤ 768px) ===== */
+@media (max-width: 768px) {
+  body {
+    background: #eae4e4; /* Couleur bleue sur mobile */
+  }
+}
+
+
+/* ===== Par défaut (PC) ===== */
+.main-wrapper {
+  border: 3px solid rgb(139, 134, 238);
+  padding: 20px;
+  margin: 20px;
+  border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+  .main-wrapper {
+    border: 3px solid #f6f6fb;     /* Une bordure visible mais plus fine */
+    padding: 5px;                 /* Moins d’espace interne */
+    margin: 10px auto;             /* Centrage + moins de marge */
+    border-radius: 2px;            /* Coins légèrement arrondis */
+    width: 90%;                    /* Ajustable : 90% de la largeur de l'écran */
+  }
+}
+h3, h2 {
+   
+    font-size: 18px;
+}
+
+
+h1, h2 , h3  {
+    text-align: center;
+    margin-bottom: 5px; /* Réduction de l'espace sous les titres */
+}
+
+/* Conteneur des images en haut */
+.image-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px auto;
+    width: 79%;
+}
+
+/* Style d’image */
+.image-placeholder {
+    width: 100px;
+    height: 100px; /* Assure que c’est un carré */
+    object-fit: cover; /* Remplissage sans déformation */
+    border: 2px solid rgb(4, 8, 251);
+    border-radius: 50%; /* Forme circulaire */
+    overflow: hidden; /* Coupe l’image au cercle */
+}
+
+/* ===== Affichage par défaut (PC) ===== */
+.title-desktop {
+    display: block;
+}
+
+.title-mobile-wrapper {
+    display: none;
+}
+
+.hide-on-mobile {
+    display: block;
+}
+
+.mobile-only {
+    display: none; /* Masqué sur PC */
+}
+
+
+/* ===== Affichage mobile uniquement (max 768px) ===== */
+@media (max-width: 768px) {
+    .title-desktop {
+        display: none;
+    }
+
+    .title-mobile-wrapper {
+        display: flex;
+        flex-direction: row; /* mettre en ligne */
+
+        font-size: 18px; /* Taille du texte plus lisible sur mobile */
+    
+    font-weight: 800; /* Pour un texte un peu plus visible */
+    line-height: 1.4;
+        
+        align-items: center;
+        gap: 10px;
+        margin-top: 15px;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .title-mobile-wrapper img {
+        height: 50px;
+        width: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgb(251, 148, 4);
+    }
+
+    .title-mobile-wrapper .text-block {
+        display: flex;
+        flex-direction: column;
+        font-size: 16px;
+        color: rgb(250, 161, 7);
+    }
+
+    .hide-on-mobile {
+        display: none;
+    }
+
+    .mobile-only {
+        display: block;
+        color: #3835f0;
+        font-size: 18px;
+        margin: 5px 0;
+        text-align: center;
+        font-weight: 800; /* Pour un texte un peu plus visible */
+    }
+}
+
+  
+
+/* TABLEAU DES DONNÉES */
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.table-wrapper table {
+    min-width: 750px; /* Largeur minimale pour forcer le scroll horizontal */
+}
+
+table {
+    width: 84%;
+    border-collapse: collapse;
+    margin: 10px auto; /* Réduction de l'espacement vertical */
+    font-family: Arial, sans-serif;
+    border: 2px solid rgba(249, 249, 252, 0.975); /* Bordure extérieure corrigée */
+}
+th, td {
+    border: 1px solid #b5a9e8;
+    padding: 15px;
+    text-align: center;
+    font-size: 20px;
+}
+
+td {
+    background-color:#fffdfd;
+    font-weight: bold;
+}
+
+th {
+    background-color: #fef9f9;
+    font-weight: bold;
+}
+
+.title-row th {
+    background-color: #f7f4f4;
+    font-size: 1.8em;
+    padding: 12px;
+}
+
+  
+
+/* SECTION DES COMMANDES */
+.command-section {
+    display: flex;
+    justify-content: center; /* Centrage horizontal */
+    gap:8px; /* Espacement régulier entre les stations */
+    margin: 20px auto;
+    width: 84%;
+}
+
+.station {
+    width: 28%;
+    padding: 15px;
+    border: 2px solid #f7f6fb;
+    background-color: #f8f5f5;
+    text-align: center;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Boutons généraux */
+button {
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+    padding: 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.1s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Effet de survol pour les boutons */
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Bouton d'activation (vert) */
+button.activate {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Bouton d'activation quand actif (jaune) */
+button.activate.active {
+    background-color: #ffc107; /* Jaune */
+    color: #1f07fb;
+}
+
+/* Survol d’un bouton actif (jaune) */
+button.activate.active:hover {
+    background-color: #e0b806;
+}
+
+/* Bouton de désactivation (rouge) */
+button.desactivate {
+    background-color: #dc3545;
+    color: white;
+}
+
+button.desactivate:hover {
+    background-color: #c82333;
+}
+
+/* Effet lorsqu'on clique sur un bouton */
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 4px rgba(10, 10, 0, 0.2);
+}
+
+/* Statut */
+.status {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+
+
+/* Pour mobile : permet uniquement le scroll horizontal du tableau */
+@media (max-width: 768px) {
+    .table-wrapper {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-wrapper table {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .command-section {
+        flex-direction: column;
+        align-items: center;
+        width: 95%;
+    }
+
+    .station {
+        width: 90%;
+        min-height: 180px; /* Hauteur minimale, réglable selon tes préférences */
+        height: auto;       /* Laisse le contenu définir la hauteur finale */
+        margin-bottom: 15px;
+    }
+}
+
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%; /* ou 85%, selon ce que tu veux */
+  max-width: 500px;
+  background-color: #d3d3c5;
+  padding: 5px 0;
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+  z-index: 1000;
+  box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.2);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+
+
+.bottom-nav .nav-item {
+  font-size: 22px;
+  color: #1408f4;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.bottom-nav .nav-item:hover {
+  transform: scale(1.2);
+}
+
+.bottom-nav .nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 13px;
+  background-color: #1408f4;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+

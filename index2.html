@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBN -@electro-elites</title>
+    <link rel="stylesheet" href="style3.css">
+    
+    <!-- Importation Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="overlay">
+        <div class="content">
+            <!-- Section gauche --> 
+            <div class="left-section">
+                <h2>SYSTÈME DE NUMÉRISATION DU TRANSPORT ÉLECTRIQUE</h2>
+                <h1>LES ELECTRO-ELITES</h1>
+                <p>Bienvenue dans le système de numérisation du réseau de transport électrique en RDC conçu par <span class="highlight">@electro-elites</span>.</p>
+                <div class="buttons">
+                    <button class="btn-orange">Se connecter</button>
+                    <button class="btn-yellow">Check Data</button>
+                </div>
+            </div>
+
+            <!-- Boîte de connexion -->
+            <div class="login-box">
+                <h3>Se connecter</h3>
+                <label for="username">NOM D'UTILISATEUR :</label>
+                <input type="text" id="username">
+                
+                <label for="password">MOT DE PASSE :</label>
+                <input type="password" id="password">
+                
+                <button class="btn-blue" onclick="login()">CONNEXION</button>
+            </div>
+        </div>
+    </div>
+
+
+    
+
+    <script>
+        parler("Connecté-vous au reseau,electrique,intelligent(4.0),en R,D,C ");
+    let modeSilencieux = false; // Pour contrôler si on doit parler ou non
+    // Fonction de synthèse vocale
+        function parler(message) {
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.lang = "fr-FR"; // Français
+        speechSynthesis.speak(utterance);
+}
+
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyArEB0lH1tz3OOvrgKzL0cypYfMpQVgPm0",
+            authDomain: "maison-iot-b0dd6.firebaseapp.com",
+            databaseURL: "https://maison-iot-b0dd6-default-rtdb.firebaseio.com",
+            projectId: "maison-iot-b0dd6",
+            storageBucket: "maison-iot-b0dd6.appspot.com", // Correction ici
+            messagingSenderId: "838021465845",
+            appId: "1:838021465845:web:b277f02fd883b0c23627bc",
+            measurementId: "G-P697GH67M1"
+        };
+
+        // Initialisation de Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Fonction de connexion
+        function login() {
+            var username = document.getElementById("username").value.trim();
+            var password = document.getElementById("password").value.trim();
+
+            if (username === "" || password === "") {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            var userRef = database.ref("users/" + username);
+
+            userRef.get().then((snapshot) => {
+                if (snapshot.exists()) {
+                    var storedPassword = snapshot.val().password;
+                    if (storedPassword === password) {
+                        window.location.href = "HBNK.html";
+                        document.getElementById("username").value="";
+                        document.getElementById("password").value="";
+                    } else {
+                        alert("Mot de passe incorrect.");
+                        document.getElementById("username").value="";
+                        document.getElementById("password").value="";
+                    }
+                } else {
+                    alert("Nom d'utilisateur non trouvé.");
+                    document.getElementById("username").value="";
+                        document.getElementById("password").value="";
+                }
+            }).catch((error) => {
+                console.error("Erreur Firebase:", error);
+            });
+        }
+    </script>
+</body>
+</html>

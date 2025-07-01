@@ -1,0 +1,210 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: url('images/logo3.jpg') no-repeat center center/cover;
+  overflow: hidden; /* Empêche le scroll partout */
+}
+
+/* Superposition pour l'effet sombre */
+.overlay {
+  width: 100%;
+  height: 100vh; /* 100% de la hauteur visible */
+  background: rgba(2, 12, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+
+/* Conteneur principal */
+.content {
+    width: 95%;
+    
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+/* Section gauche */
+.left-section {
+    max-width: 50%;
+}
+
+.left-section h2 {
+    color: orange;
+    font-size: 25px;
+    margin-bottom: 10px;
+}
+
+.left-section h1 {
+    font-size: 28px;
+    color: #5ec5ff;
+    margin-bottom: 10px;
+}
+
+.left-section p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.highlight {
+    color: orange;
+}
+
+/* Boutons */
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-orange, .btn-yellow {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.btn-orange {
+    background-color: orange;
+    color: white;
+}
+
+.btn-yellow {
+    background-color: yellow;
+    color: black;
+}
+
+/* Boîte de connexion */
+.login-box {
+    width: 420px;
+    height: 500px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Style du titre "Se connecter" avec un contour */
+.login-box h3 {
+    color: orange;
+    border: 2px solid orange;
+    padding: 10px;
+    display: block;
+    border-radius: 2px;
+    text-align: left;
+    width: 95%;
+}
+
+/* Champs de saisie */
+.login-box label {
+    display: block;
+    font-size: 14px;
+    margin: 15px 0 5px;
+}
+
+.login-box input {
+    width: 95%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 3px;
+    background: #333;
+    color: white;
+    font-size: 16px;
+}
+
+/* Bouton connexion */
+.btn-blue {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: #007BFF;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.btn-blue:hover {
+    background: #0056b3;
+}
+
+@media screen and (max-width: 768px) {
+  html, body {
+    overflow-y: auto; /* autorise scroll vertical */
+    height: 100%;
+  }
+
+  .overlay {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    height: 100%;
+  }
+
+  .content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: auto;
+    overflow: visible;
+  }
+
+  .left-section, .login-box {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .login-box {
+  margin-top: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 55vh;       /* hauteur 100% de la fenêtre visible */
+  max-height: none;
+  overflow: auto;      /* scroll si contenu dépasse */
+  padding: 15px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.7); /* pour garder le fond sombre */
+}
+
+
+  .buttons {
+    display: none; /* cache les boutons */
+  }
+
+  .login-box h3 {
+    text-align: center;
+  }
+
+  /* Ajustement responsive des polices et champs */
+  .login-box label,
+  .login-box input,
+  .login-box h3 {
+    font-size: calc(12px + 1vw);
+  }
+
+  /* Faire bouton connexion même largeur que champs */
+  .btn-blue {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Assurer que les inputs remplissent bien la largeur */
+  .login-box input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

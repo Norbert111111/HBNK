@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de Bord IoT/IA</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style4.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      new Chart(document.getElementById("barChart"), {
+        type: 'bar',
+        data: {
+          labels: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '24:00'],
+          datasets: [{
+            label: 'Énergie consommée',
+            data: [10, 12, 15, 18, 22, 30, 28, 34, 40, 38, 25, 20, 22],
+            backgroundColor: '#7059f3'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          },
+          plugins: {legend: {display: false}}
+        }
+      });
+
+      new Chart(document.getElementById("miniBarChart"), {
+        type: 'bar',
+        data: {
+          labels: ['S1', 'S2', 'S3', 'S4'],
+          datasets: [{
+            label: 'Historique',
+            data: [20, 25, 30, 28],
+            backgroundColor: '#9ea9f5'
+          }]
+        },
+        options: {
+          plugins: {legend: {display: false}},
+          scales: {y: {beginAtZero: true}},
+          maintainAspectRatio: false
+        }
+      });
+
+      new Chart(document.getElementById("lineChart"), {
+        type: 'line',
+        data: {
+          labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+          datasets: [{
+            label: 'Variation',
+            data: [12, 14, 18, 20, 17, 22, 25],
+            borderColor: '#36c',
+            backgroundColor: 'rgba(54, 100, 255, 0.2)',
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {legend: {display: false}},
+          scales: {y: {beginAtZero: true}}
+        }
+      });
+    });
+  </script>
+  <style>
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <header>
+      <img src="profile.jpg" alt="Photo de profil" class="profile">
+      <div>
+        <h1>LIGNE DE TRANSPORT ÉLECTRIQUE INTELLIGENTE</h1>
+        <h2>Basée sur l’IoT et l’IA</h2>
+        <p>Consommation et tableau de bord</p>
+      </div>
+    </header>
+
+    <section class="main-grid">
+      <div class="card total-energy">
+        <h3>Total</h3>
+        <p class="value">398,02 kWh</p>
+        <button class="btn">⚡ Consommation par minute</button>
+      </div>
+
+      <div class="card consumption">
+        <h3>Consommation</h3>
+        <p>98%</p>
+        <div class="chart-wrapper"><canvas id="barChart"></canvas></div>
+        <p class="bottom">9,40%</p>
+      </div>
+
+      <div class="card gauges">
+        <div class="gauge">
+          <h4>PUISSANCE ACTIVE</h4>
+          <p>48%</p>
+        </div>
+        <div class="gauge">
+          <h4>PUISSANCE APPARENTE</h4>
+          <p>15%</p>
+        </div>
+      </div>
+
+      <div class="card line-data">
+        <h3>Données de la ligne</h3>
+        <ul>
+          <li>Courant : 10 A</li>
+          <li>Tension : 15 V</li>
+          <li>Puissance active : 75%</li>
+          <li>Température : 14 °C</li>
+          <li>Humidité : 20%</li>
+        </ul>
+      </div>
+
+      <div class="card bars">
+        <h4>Il y a 30 jours</h4>
+        <div class="chart-wrapper"><canvas id="miniBarChart"></canvas></div>
+      </div>
+
+      <div class="card line">
+        <div class="chart-wrapper"><canvas id="lineChart"></canvas></div>
+      </div>
+
+      <div class="card stats">
+        <div>
+          <p>⬆ 38%</p>
+        </div>
+        <div>
+          <p>⬇ 20%</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+<!-- Barre de navigation fixe -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="window.location.href='index2.html'">
+    <i class="fas fa-home"></i>
+  </div>
+  <div class="nav-item" onclick="window.location.href='HBNK.html'">
+    <i class="fas fa-sliders-h"></i>
+  </div>
+  <div class="nav-item" onclick="window.location.href='index3.html'">
+    <i class="fas fa-chart-line"></i>
+  </div>
+  <div class="nav-item" onclick="window.location.href='messages.html'">
+    <i class="fas fa-envelope"></i>
+  </div>
+  <div class="nav-item" onclick="window.location.href='profil.html'">
+    <i class="fas fa-user"></i>
+  </div>
+</div>
+
+</body>
+</html>
