@@ -1,167 +1,434 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tableau de Bord IoT/IA</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="style4.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard IoT/IA Connecté</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style4.css" />
+
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      new Chart(document.getElementById("barChart"), {
-        type: 'bar',
-        data: {
-          labels: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '24:00'],
-          datasets: [{
-            label: 'Énergie consommée',
-            data: [10, 12, 15, 18, 22, 30, 28, 34, 40, 38, 25, 20, 22],
-            backgroundColor: '#7059f3'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          },
-          plugins: {legend: {display: false}}
-        }
-      });
 
-      new Chart(document.getElementById("miniBarChart"), {
-        type: 'bar',
-        data: {
-          labels: ['S1', 'S2', 'S3', 'S4'],
-          datasets: [{
-            label: 'Historique',
-            data: [20, 25, 30, 28],
-            backgroundColor: '#9ea9f5'
-          }]
-        },
-        options: {
-          plugins: {legend: {display: false}},
-          scales: {y: {beginAtZero: true}},
-          maintainAspectRatio: false
-        }
-      });
-
-      new Chart(document.getElementById("lineChart"), {
-        type: 'line',
-        data: {
-          labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-          datasets: [{
-            label: 'Variation',
-            data: [12, 14, 18, 20, 17, 22, 25],
-            borderColor: '#36c',
-            backgroundColor: 'rgba(54, 100, 255, 0.2)',
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {legend: {display: false}},
-          scales: {y: {beginAtZero: true}}
-        }
-      });
-    });
-  </script>
-  <style>
-    canvas {
-      width: 100% !important;
-      height: 100% !important;
-    }
-  </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
 </head>
+
 <body>
   <div class="dashboard">
     <header>
-      <img src="profile.jpg" alt="Photo de profil" class="profile">
+      <img src="images/logo1.jpg" alt="Logo1" class="profile">
       <div>
-        <h1>LIGNE DE TRANSPORT ÉLECTRIQUE INTELLIGENTE</h1>
+        <h1>RESEAU 4.0 DE TRANSPORT ÉLECTRIQUE INTELLIGENTE</h1>
         <h2>Basée sur l’IoT et l’IA</h2>
-        <p>Consommation et tableau de bord</p>
+        <p>Consommation et tableau de bord (ANNEE 2025)</p>
       </div>
+   
     </header>
 
     <section class="main-grid">
+      <!-- Énergie totale -->
       <div class="card total-energy">
-        <h3>Total</h3>
-        <p class="value">398,02 kWh</p>
-        <button class="btn">⚡ Consommation par minute</button>
+        <h3>Total Consomation Journaliere</h3>
+        <p class="value">0 Wh</p>
+        <button class="btn">⚡ Consommation Journaliere </button>
       </div>
 
+      <!-- Consommation actuelle dynamique -->
       <div class="card consumption">
-        <h3>Consommation</h3>
-        <p>98%</p>
+        <h3>Consommation Par intervale d'heure</h3>
+        <p>0 %</p>
         <div class="chart-wrapper"><canvas id="barChart"></canvas></div>
-        <p class="bottom">9,40%</p>
+        <p class="bottom">Énergie consommée aujourd'hui</p>
       </div>
 
-      <div class="card gauges">
-        <div class="gauge">
-          <h4>PUISSANCE ACTIVE</h4>
-          <p>48%</p>
-        </div>
-        <div class="gauge">
-          <h4>PUISSANCE APPARENTE</h4>
-          <p>15%</p>
-        </div>
-      </div>
-
-      <div class="card line-data">
-        <h3>Données de la ligne</h3>
-        <ul>
-          <li>Courant : 10 A</li>
-          <li>Tension : 15 V</li>
-          <li>Puissance active : 75%</li>
-          <li>Température : 14 °C</li>
-          <li>Humidité : 20%</li>
-        </ul>
-      </div>
-
-      <div class="card bars">
-        <h4>Il y a 30 jours</h4>
-        <div class="chart-wrapper"><canvas id="miniBarChart"></canvas></div>
-      </div>
-
+       <!-- Courbe variation -->
+        
       <div class="card line">
+        <h3>Analyse de la consommation Journaliere</h3>
         <div class="chart-wrapper"><canvas id="lineChart"></canvas></div>
       </div>
 
-      <div class="card stats">
-        <div>
-          <p>⬆ 38%</p>
+      <!-- Puissance -->
+      <div class="card gauges">
+        <div class="gauge">
+          <h4>PUISSANCE ACTIVE</h4>
+          <p id="PUISS">-- W</p>
         </div>
-        <div>
-          <p>⬇ 20%</p>
+        <div class="gauge">
+          <h4>PUISSANCE APPARENTE</h4>
+          <p id="PUISSA">-- VA</p>
+        </div>
+        <div class="gauge">
+          <h4>Cos φ</h4>
+          <p id="Cos">--</p>
         </div>
       </div>
+
+        <!-- Historique dynamique -->
+      <div class="card bars">
+        <h4 id="header-historique">Historique de la consommation</h4>
+        <div class="chart-wrapper"><canvas id="miniBarChart"></canvas></div>
+      </div>
+
+      <!-- Courbe de la puissance active -->
+<div class="card power-curve">
+  <h4>Puissance active vs Temps</h4>
+  <div class="chart-wrapper">
+    <canvas id="powerChart"></canvas>
+  </div>
+</div> 
+
+
+      <!-- Données techniques -->
+      <div class="card line-data">
+        <h3>Données de la ligne</h3>
+        <ul>
+          <li id="COURANT">Courant : -- A</li>
+          <li id="DDP">Tension : -- V</li>
+          <li><span>Température :</span> <span id="TEMP">-- °C</span></li>
+          <li><span>Humidité :</span> <span id="HUM">-- %</span></li>
+        </ul>
+      </div>
+
+    
+     
+
+      <!-- Résumé visuel -->
+      <div class="card stats">
+        <div><p id="TEMP_STATS">⬆ Température : -- °C</p></div>
+        <div><p id="HUM_STATS">⬇ Humidité : --%</p></div>
+      </div>
+
+      
+
     </section>
   </div>
 
-<!-- Barre de navigation fixe -->
-<div class="bottom-nav">
-  <div class="nav-item active" onclick="window.location.href='index2.html'">
-    <i class="fas fa-home"></i>
-  </div>
-  <div class="nav-item" onclick="window.location.href='HBNK.html'">
-    <i class="fas fa-sliders-h"></i>
-  </div>
-  <div class="nav-item" onclick="window.location.href='index3.html'">
-    <i class="fas fa-chart-line"></i>
-  </div>
-  <div class="nav-item" onclick="window.location.href='messages.html'">
-    <i class="fas fa-envelope"></i>
-  </div>
-  <div class="nav-item" onclick="window.location.href='profil.html'">
-    <i class="fas fa-user"></i>
-  </div>
-</div>
 
+  <!-- Navigation fixe bas -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="window.location.href='index.html'">
+      <i class="fas fa-home"></i>
+    </div>
+    <div class="nav-item" onclick="window.location.href='HBNK.html'">
+      <i class="fas fa-sliders-h"></i>
+    </div>
+    <div class="nav-item" onclick="window.location.href='index3.html'">
+      <i class="fas fa-chart-line"></i>
+    </div>
+   
+
+  <script>
+    // ================== Configuration Firebase ==================
+    const firebaseConfig = {
+      apiKey: "AIzaSyArEB0lH1tz3OOvrgKzL0cypYfMpQVgPm0",
+      authDomain: "maison-iot-b0dd6.firebaseapp.com",
+      databaseURL: "https://maison-iot-b0dd6-default-rtdb.firebaseio.com",
+      projectId: "maison-iot-b0dd6",
+      storageBucket: "maison-iot-b0dd6.appspot.com",
+      messagingSenderId: "838021465845",
+      appId: "1:838021465845:web:b277f02fd883b0c23627bc",
+      measurementId: "G-P697GH67M1"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Variables globales
+    let Tension = 0;
+    let Courant = 0;
+    let puissanceActive = 0;
+    let consommationWh = 0;
+    let tempsFonctionnementSec = 0;
+    let dateCourante = new Date().toDateString();
+    let lastKnownConsommation = 0;
+    let isDataLoaded = false;
+    let historiqueJours = [];
+
+    // Consommation horaire pour barChart
+    const consommationHoraire = {
+      labels: ['00h', '04h', '08h', '12h', '16h', '20h'],
+      data: [0, 0, 0, 0, 0, 0]
+    };
+
+
+    
+    // Initialisation Chart.js - Bar Chart consommation par tranche horaire
+    const ctxBarChart = document.getElementById("barChart").getContext("2d");
+    const barChart = new Chart(ctxBarChart, {
+      type: 'bar',
+      data: {
+        labels: consommationHoraire.labels,
+        datasets: [{
+          label: 'Énergie consommée (Wh)',
+          data: consommationHoraire.data,
+          backgroundColor: '#7059f3'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    // Initialisation Chart.js - Line Chart consommation en temps réel
+    const dataLineChart = { labels: [], data: [] };
+    const ctxLineChart = document.getElementById("lineChart").getContext("2d");
+    const lineChart = new Chart(ctxLineChart, {
+      type: 'line',
+      data: {
+        labels: dataLineChart.labels,
+        datasets: [{
+          label: 'Consommation (Wh)',
+          data: dataLineChart.data,
+          borderColor: '#36c',
+          backgroundColor: 'rgba(54, 100, 255, 0.2)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    // Initialisation Chart.js - Mini Bar Chart historique consommation journalière
+    const ctxMiniBarChart = document.getElementById("miniBarChart").getContext("2d");
+    const miniBarChart = new Chart(ctxMiniBarChart, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Consommation journalière (Wh)',
+          data: [],
+          backgroundColor: '#9ea9f5'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+
+
+    // ================== Courbe de puissance active ==================
+const ctxPowerChart = document.getElementById("powerChart").getContext("2d");
+const dataPowerChart = {
+  labels: [],
+  data: []
+};
+
+const powerChart = new Chart(ctxPowerChart, {
+  type: 'line',
+  data: {
+    labels: dataPowerChart.labels,
+    datasets: [{
+      label: 'Puissance active (W)',
+      data: dataPowerChart.data,
+      borderColor: '#1408f4',
+     backgroundColor: 'rgba(20, 8, 244, 0.1)', // bleu foncé transparent
+      tension: 0.4,
+      fill: true
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Watt (W)'
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: ''
+        }
+      }
+    }
+  }
+});
+
+
+
+    // Mise à jour titre carte historique
+    function updateHeaderHistorique() {
+      const header = document.getElementById("header-historique");
+      if (!historiqueJours.length) {
+        header.textContent = "Aucune donnée historique";
+        return;
+      }
+      const lastDate = new Date(historiqueJours[historiqueJours.length - 1].date);
+      const now = new Date();
+      const diff = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+      header.textContent = diff === 0 ? "Aujourd'hui" : `Il y a ${diff} jour(s)`;
+    }
+
+    // Mise à jour graphique historique miniBarChart
+    function updateMiniBarChart() {
+      miniBarChart.data.labels = historiqueJours.map(h => {
+        const d = new Date(h.date);
+        return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      });
+      miniBarChart.data.datasets[0].data = historiqueJours.map(h => h.consommation.toFixed(2));
+      miniBarChart.update();
+      updateHeaderHistorique();
+    }
+
+    // Mise à jour puissance active, apparente, et facteur de puissance
+    function updatePower() {
+      const F = 0.9;
+      const p = Tension * Courant * F;
+      puissanceActive = (isNaN(p) || p < 0) ? 0 : p;
+      const puissanceA = Tension * Courant;
+
+      document.getElementById("PUISS").textContent = puissanceActive.toFixed(2) + " W";
+      document.getElementById("PUISSA").textContent = puissanceA.toFixed(2) + " VA";
+      document.getElementById("Cos").textContent = F;
+
+      database.ref("Data/puissance").set(puissanceActive);
+      database.ref("Data/puissanceA").set(puissanceA);
+    }
+
+    // Mise à jour consommation avec conservation de la dernière valeur si puissance = 0
+    function updateConsommation() {
+      const nouvelleDate = new Date().toDateString();
+
+      // Réinitialisation journalière si changement de jour
+      if (nouvelleDate !== dateCourante) {
+        historiqueJours.push({
+          date: dateCourante,
+          consommation: consommationWh
+        });
+        if (historiqueJours.length > 30) historiqueJours.shift();
+        database.ref("Data/historiqueConsommation").set(historiqueJours);
+        consommationWh = 0;
+        tempsFonctionnementSec = 0;
+        dateCourante = nouvelleDate;
+        lastKnownConsommation = 0;
+        updateMiniBarChart();
+        consommationHoraire.data = [0, 0, 0, 0, 0, 0];
+        barChart.update();
+      }
+
+      if (puissanceActive > 0) {
+        tempsFonctionnementSec++;
+        consommationWh = (puissanceActive * tempsFonctionnementSec) / 3600;
+        lastKnownConsommation = consommationWh;
+      } else {
+        // Si consommation à 0, on garde la dernière valeur connue
+        consommationWh = lastKnownConsommation || consommationWh;
+      }
+
+      // Mise à jour consommation horaire
+      const now = new Date();
+      const tranche = Math.floor(now.getHours() / 4);
+      consommationHoraire.data[tranche] += puissanceActive / 3600;
+      barChart.update();
+
+      
+
+
+      // Ajout dans le graphique Puissance active vs Temps
+const timeLabel = new Date().toLocaleTimeString();
+if (dataPowerChart.labels.length >= 30) {
+  dataPowerChart.labels.shift();
+  dataPowerChart.data.shift();
+}
+dataPowerChart.labels.push(timeLabel);
+dataPowerChart.data.push(puissanceActive.toFixed(2));
+powerChart.update();
+
+      // Calcul pourcentage consommation (max 1000 Wh = 100%)
+      const pourcentage = Math.min(100, (consommationWh / 1000) * 100);
+      document.querySelector(".consumption p").textContent = pourcentage.toFixed(1) + " %";
+      document.querySelector(".total-energy .value").textContent = consommationWh.toFixed(2) + " Wh";
+
+      // Mise à jour graphique consommation temps réel (lineChart)
+      const nowLabel = now.toLocaleTimeString();
+      if (dataLineChart.labels.length >= 20) {
+        dataLineChart.labels.shift();
+        dataLineChart.data.shift();
+      }
+      dataLineChart.labels.push(nowLabel);
+      dataLineChart.data.push(consommationWh.toFixed(2));
+      lineChart.update();
+
+      // Sauvegarde dans Firebase
+      database.ref("Data/consommationJour").set({
+        consommationWh: consommationWh,
+        tempsFonctionnementSec: tempsFonctionnementSec,
+        dateCourante: dateCourante
+      });
+    }
+
+    // Chargement des données historique et consommation au démarrage
+    database.ref("Data/historiqueConsommation").once("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        historiqueJours = data;
+        updateMiniBarChart();
+      }
+    });
+
+    database.ref("Data/consommationJour").once("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        consommationWh = data.consommationWh || 0;
+        tempsFonctionnementSec = data.tempsFonctionnementSec || 0;
+        dateCourante = data.dateCourante || new Date().toDateString();
+        lastKnownConsommation = consommationWh;
+      }
+      isDataLoaded = true;
+      startUpdateLoop();
+    });
+
+    // Mise à jour des données techniques en temps réel
+    database.ref("Data/Temperature").on("value", (snap) => {
+      const val = snap.val();
+      document.getElementById("TEMP").textContent = val + " °C";
+      document.getElementById("TEMP_STATS").textContent = "🌡️ Température : " + val + " °C";
+    });
+
+    database.ref("Data/hymidite").on("value", (snap) => {
+      const val = snap.val();
+      document.getElementById("HUM").textContent = val + " %";
+      document.getElementById("HUM_STATS").textContent = "💧 Humidité : " + val + " %";
+    });
+
+    database.ref("Data/Tension").on("value", (snap) => {
+      Tension = snap.val();
+      document.getElementById("DDP").textContent = "Tension : " + Tension + " V";
+    });
+
+    database.ref("Data/Courant").on("value", (snap) => {
+      Courant = snap.val();
+      document.getElementById("COURANT").textContent = "Courant : " + Courant + " A";
+    });
+
+    
+
+    // Démarrage de la boucle de mise à jour après chargement des données
+    function startUpdateLoop() {
+      setInterval(() => {
+        if (!isDataLoaded) return;
+        updatePower();
+        updateConsommation();
+      }, 1000);
+    }
+  </script>
 </body>
 </html>

@@ -21,8 +21,8 @@ body {
 
 
 /* ===== Par défaut (PC) ===== */
-.main-wrapper {
-  border: 3px solid rgb(139, 134, 238);
+.main-wraDpper {
+  border: 4px solid #fcfcfe;
   padding: 20px;
   margin: 20px;
   border-radius: 3px;
