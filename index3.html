@@ -19,16 +19,20 @@
 
 <body>
   <div class="dashboard">
-    <header>
-      <img src="images/logo1.jpg" alt="Logo1" class="profile">
-      <div>
-        <h1>RESEAU 4.0 DE TRANSPORT ÉLECTRIQUE INTELLIGENTE</h1>
-        <h2>Basée sur l’IoT et l’IA</h2>
-        <p>Consommation et tableau de bord (ANNEE 2025)</p>
-      </div>
-   
-    </header>
-
+   <header class="header-container">
+  <img src="images/logo1.jpg" alt="Logo1" class="profile">
+  <div class="header-text">
+    <h1>RESEAU 4.0 DE TRANSPORT ÉLECTRIQUE INTELLIGENT</h1>
+   <h2>
+  Basée sur l’IoT et l’IA<br>
+  <span class="hide-on-mobile" style="color: #3633c6;">
+    Consommation Pour la journée d'aujourd'hui et tableau de bord (ANNÉE 2025)
+  </span>
+</h2>
+  </div>
+</header>
+  <p class="info-color">Consommation Pour la journée d'aujourd'hui et tableau de bord (ANNÉE 2025)</p>
+    
     <section class="main-grid">
       <!-- Énergie totale -->
       <div class="card total-energy">
@@ -42,7 +46,7 @@
         <h3>Consommation Par intervale d'heure</h3>
         <p>0 %</p>
         <div class="chart-wrapper"><canvas id="barChart"></canvas></div>
-        <p class="bottom">Énergie consommée aujourd'hui</p>
+        <p class="bottom">Énergie usée par intervale de temps</p>
       </div>
 
        <!-- Courbe variation -->
@@ -50,6 +54,7 @@
       <div class="card line">
         <h3>Analyse de la consommation Journaliere</h3>
         <div class="chart-wrapper"><canvas id="lineChart"></canvas></div>
+        <p class="bottom">Énergie consommée à chaque Seconde</p>
       </div>
 
       <!-- Puissance -->
@@ -123,6 +128,15 @@
    
 
   <script>
+
+     parler("Bienvenue sur le Dashboard du réseau électrique intelligent en R D C.");
+    let modeSilencieux = false; // Pour contrôler si on doit parler ou non
+    // Fonction de synthèse vocale
+        function parler(message) {
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.lang = "fr-FR"; // Français
+        speechSynthesis.speak(utterance);
+}
     // ================== Configuration Firebase ==================
     const firebaseConfig = {
       apiKey: "AIzaSyArEB0lH1tz3OOvrgKzL0cypYfMpQVgPm0",
@@ -150,9 +164,9 @@
 
     // Consommation horaire pour barChart
     const consommationHoraire = {
-      labels: ['00h', '04h', '08h', '12h', '16h', '20h'],
-      data: [0, 0, 0, 0, 0, 0]
-    };
+  labels: ['00h-04h', '04h-08h', '08h-12h', '12h-16h', '16h-20h', '20h-00h'],
+  data: [0, 0, 0, 0, 0, 0]
+};
 
 
     
@@ -323,21 +337,39 @@ const powerChart = new Chart(ctxPowerChart, {
         consommationHoraire.data = [0, 0, 0, 0, 0, 0];
         barChart.update();
       }
+if (puissanceActive > 0) {
+  tempsFonctionnementSec++;
+  consommationWh = (puissanceActive * tempsFonctionnementSec) / 3600;
+  lastKnownConsommation = consommationWh;
 
-      if (puissanceActive > 0) {
-        tempsFonctionnementSec++;
-        consommationWh = (puissanceActive * tempsFonctionnementSec) / 3600;
-        lastKnownConsommation = consommationWh;
-      } else {
-        // Si consommation à 0, on garde la dernière valeur connue
-        consommationWh = lastKnownConsommation || consommationWh;
-      }
+  const now = new Date();
+  const tranche = Math.floor(now.getHours() / 4);
+  consommationHoraire.data[tranche] += puissanceActive / 3600;
 
-      // Mise à jour consommation horaire
+  // Mise à jour visuelle du graphique
+  barChart.data.datasets[0].data = consommationHoraire.data.map(v => parseFloat(v.toFixed(2)));
+  barChart.update();
+
+  // 🔁 Sauvegarde dans Firebase pour persistance après redémarrage
+  database.ref("Data/consommationHoraire").set(consommationHoraire.data);
+} else {
+  consommationWh = lastKnownConsommation || consommationWh;
+}
+
+      // Mise à jour consommation horaire (en Wh)
       const now = new Date();
-      const tranche = Math.floor(now.getHours() / 4);
-      consommationHoraire.data[tranche] += puissanceActive / 3600;
-      barChart.update();
+      const heureActuelle = now.getHours();
+      const trancheIndex = Math.floor(heureActuelle / 4); // 6 tranches de 4h
+
+      const consoTranche = puissanceActive / 3600; // Wh par seconde
+      consommationHoraire.data[trancheIndex] += consoTranche;
+
+    // Mise à jour visuelle du graphique
+     barChart.data.datasets[0].data = consommationHoraire.data.map(val => val.toFixed(2));
+     barChart.update();
+
+     document.querySelector(".consumption p").textContent =
+  ((consommationWh / 1000) * 100).toFixed(1) + " %";
 
       
 
@@ -393,6 +425,16 @@ powerChart.update();
         lastKnownConsommation = consommationWh;
       }
       isDataLoaded = true;
+      database.ref("Data/consommationHoraire").once("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data && Array.isArray(data) && data.length === consommationHoraire.data.length) {
+          consommationHoraire.data = data.map(Number);
+          barChart.data.datasets[0].data = consommationHoraire.data.map(v => parseFloat(v.toFixed(2)));
+          barChart.update();
+        }
+      });
+
+      isDataLoaded = true;
       startUpdateLoop();
     });
 
@@ -429,6 +471,11 @@ powerChart.update();
         updateConsommation();
       }, 1000);
     }
+     
+
+    
+
+
   </script>
 </body>
 </html>

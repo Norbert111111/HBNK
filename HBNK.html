@@ -13,14 +13,15 @@
 <body>
    <!-- Version desktop -->
    <div class="main-wrapper">
-      <h1 class="hide-on-mobile"style="color: #1408f4;">RESEAU 4.0 DE TRANSPORT ÉLECTRIQUE INTELLIGENT Basée Sur l'IA (AI)  EN R.D.C </h1>
-      <h2 class="hide-on-mobile"style="color: rgb(7, 15, 244);">               @HBNK.AGK                                                      </h2>
+      <h1 class="hide-on-mobile" style="color: #e4a323;">RESEAU 4.0 DE TRANSPORT ÉLECTRIQUE INTELLIGENT Basée Sur l'IA(AI)  EN R.D.C </h1>
+      
+      <h2 class="hide-on-mobile" style="color: #c38c1d;">              @HBNK.AGK                                                      </h2>
 
   
   <div class="image-container">
    <img class="hide-on-mobile image-placeholder" src="images/logo1.jpg" alt="Logo1" style="height: 100px; width: 100px; border-radius: 50%; object-fit: cover;">
 
-    <h3 class="title-desktop" style="color: rgb(247, 121, 10); font-size: 22px; margin-top: 10px;">
+    <h3 class="title-desktop" style="color: rgb(76, 80, 198); font-size: 22px; margin-top: 10px;">
       <br>INTERFACE DE CONTRÔLE ET D'AFFICHAGE DES DONNÉES DU RESEAU </h3>
 
     <img class="hide-on-mobile image-placeholder" src="images/logo1.jpg" alt="Logo1" style="height: 100px; width: 100px; border-radius: 50%; object-fit: cover;">
@@ -68,7 +69,7 @@
   </div>
 
   
-  <h3 style="color: rgba(251, 123, 4, 0.988);">CONTROLE ET COMMANDE DE LIGNES DE DISTRIBUTION</h3>
+  <h3 style="color: rgba(64, 64, 202, 0.988);">CONTROLE ET COMMANDE DE LIGNES DE DISTRIBUTION</h3>
   
   <section class="command-section">
     <div class="station gombe">
@@ -118,7 +119,7 @@
 
 
   <script>
-    parler("Bienvenue; à l'interface de controle et de commande du reseau electrique intelligent en R,D,C . ");
+    parler("Bienvenue sur l’interface de contrôle et de commande du réseau électrique intelligent en R D C.");
     // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyArEB0lH1tz3OOvrgKzL0cypYfMpQVgPm0",
@@ -225,13 +226,13 @@ database.ref("Depars/Depart_GOMBE").on("value", (snapshot) => {
 function activerLimete() {
   database.ref("Depars/Depart_LIMETE").set(1);
   activerStation("limete");
-  if (!modeSilencieux)parler("Le départ pour la commune de LIMETé ; est activé ");
+  if (!modeSilencieux)parler("Le départ pour la commune de Limété  ; est activé ");
 }
 
 function desactiverLimete() {
   database.ref("Depars/Depart_LIMETE").set(0);
   desactiverStation("limete");
-  if (!modeSilencieux)parler("Le départ pour la commune de LIMETé ; est désactivé ");
+  if (!modeSilencieux)parler("Le départ pour la commune de Limété  ; est désactivé ");
 }
 
 database.ref("Depars/Depart_LIMETE").on("value", (snapshot) => {
@@ -253,13 +254,13 @@ database.ref("Depars/Depart_LIMETE").on("value", (snapshot) => {
 function activerBarumbu() {
   database.ref("Depars/Depart_BARUMBU").set(1);
   activerStation("barumbu");
-  if (!modeSilencieux)parler("Le départ pour la commune de la BARùMBù ; est activé ");
+  if (!modeSilencieux)parler("Le départ pour la commune de Baroumbou ; est activé ");
 }
 
 function desactiverBarumbu() {
   database.ref("Depars/Depart_BARUMBU").set(0);
   desactiverStation("barumbu");
-  if (!modeSilencieux)parler("Le départ pour la commune de la BARùMBù ; est désactivé ");
+  if (!modeSilencieux)parler("Le départ pour la commune de Baroumbou; est désactivé ");
 }
 
 database.ref("Depars/Depart_BARUMBU").on("value", (snapshot) => {
@@ -383,15 +384,15 @@ function annoncerEtats() {
     }
 
     if (data.Depart_LIMETE == 1) {
-      activés.push("la commune de Limeté");
+      activés.push("la commune de Limété ");
     } else {
-      désactivés.push("la commune de Limeté");
+      désactivés.push("la commune de Limété ");
     }
 
     if (data.Depart_BARUMBU == 1) {
-      activés.push("la commune de Barumbu");
+      activés.push("la commune de Baroumbou");
     } else {
-      désactivés.push("la commune de Barumbu");
+      désactivés.push("la commune de Baroumbou");
     }
 
     // Annonce des états
@@ -425,7 +426,7 @@ function annoncerMesuresEtPrediction() {
 
   // Lecture vocale des mesures
   const texteMesures =
-  "Voici les mesures actuelles et la prediction de l'état du système : " +
+  "Voici les mesures actuelles et la prédiction de l'état du système : " +
   `Le courant est de ${courant} empère${courant > 1 ? "s" : ""}, ` +
   `la tension est de ${tension} volt${tension > 1 ? "s" : ""}, ` +
   `la puissance est de ${puissance} watt${puissance > 1 ? "s" : ""}, ` +
@@ -447,7 +448,7 @@ function annoncerMesuresEtPrediction() {
   if (estNormal) {
     parler("Après l'analyse de données, la prédiction montre que le fonctionnement est normal.");
   } else {
-    parler("Attention.; Selon la prediction ; des anomalies ont été détectées Apres l'analyse de données .");
+    parler("Attention.; Selon la prédiction ; des anomalies ont été détectées Apres l'analyse de données .");
   }
 }
 
