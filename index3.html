@@ -278,29 +278,65 @@ const powerChart = new Chart(ctxPowerChart, {
 
 
 
-    // Mise à jour titre carte historique
-    function updateHeaderHistorique() {
-      const header = document.getElementById("header-historique");
-      if (!historiqueJours.length) {
-        header.textContent = "Aucune donnée historique";
-        return;
-      }
-      const lastDate = new Date(historiqueJours[historiqueJours.length - 1].date);
-      const now = new Date();
-      const diff = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
-      header.textContent = diff === 0 ? "Aujourd'hui" : `Il y a ${diff} jour(s)`;
-    }
+   // Mise à jour du titre de la carte historique
+function updateHeaderHistorique() {
+  const header = document.getElementById("header-historique");
 
-    // Mise à jour graphique historique miniBarChart
-    function updateMiniBarChart() {
-      miniBarChart.data.labels = historiqueJours.map(h => {
-        const d = new Date(h.date);
-        return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-      });
-      miniBarChart.data.datasets[0].data = historiqueJours.map(h => h.consommation.toFixed(2));
-      miniBarChart.update();
-      updateHeaderHistorique();
-    }
+  const endDate = new Date(); // aujourd'hui
+  endDate.setDate(endDate.getDate() - 1); // hier
+  endDate.setHours(0, 0, 0, 0);
+
+  const joursAffiches = [];
+  for (let i = 1; i >= 0; i--) {
+    const jour = new Date(endDate);
+    jour.setDate(endDate.getDate() - i);
+    const jourISO = jour.toISOString().slice(0, 10);
+
+    const dataJour = historiqueJours.find(h => h.date.startsWith(jourISO));
+    joursAffiches.push({
+      date: jour,
+      consommation: dataJour ? dataJour.consommation : 0
+    });
+  }
+
+  const lastDate = joursAffiches[joursAffiches.length - 1].date;
+  header.textContent = `Consommation les ${joursAffiches.length} derniers jours (jusqu'au ${lastDate.toLocaleDateString('fr-FR')})`;
+}
+
+// Mise à jour graphique historique miniBarChart
+function updateMiniBarChart() {
+  const endDate = new Date(); // aujourd'hui
+  endDate.setDate(endDate.getDate() - 1); // hier
+  endDate.setHours(0, 0, 0, 0);
+
+  const joursAffiches = [];
+  for (let i = 1; i >= 0; i--) {
+    const jour = new Date(endDate);
+    jour.setDate(endDate.getDate() - i);
+    const jourISO = jour.toISOString().slice(0, 10);
+
+    const dataJour = historiqueJours.find(h => h.date.startsWith(jourISO));
+    joursAffiches.push({
+      date: jour,
+      consommation: dataJour ? dataJour.consommation : 0
+    });
+  }
+
+  miniBarChart.data.labels = joursAffiches.map(h =>
+    h.date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+  );
+
+  miniBarChart.data.datasets[0].data = joursAffiches.map(h =>
+    h.consommation.toFixed(2)
+  );
+
+  miniBarChart.update();
+  updateHeaderHistorique();
+}
+
+
+
+    
 
     // Mise à jour puissance active, apparente, et facteur de puissance
     function updatePower() {
@@ -363,6 +399,15 @@ if (puissanceActive > 0) {
 
       const consoTranche = puissanceActive / 3600; // Wh par seconde
       consommationHoraire.data[trancheIndex] += consoTranche;
+
+
+      analyserAvecIA(
+  consommationWh,
+  parseFloat(document.getElementById("TEMP").textContent),
+  parseFloat(document.getElementById("HUM").textContent),
+  Courant,
+  Tension
+);
 
     // Mise à jour visuelle du graphique
      barChart.data.datasets[0].data = consommationHoraire.data.map(val => val.toFixed(2));
@@ -472,6 +517,55 @@ powerChart.update();
       }, 1000);
     }
      
+
+    let compteurIA = 0;
+
+function analyserAvecIA(consommationActuelle, temperature, humidite, courant, tension) {
+  compteurIA++;  // Incrément à chaque appel
+
+  // Si on n'a pas encore atteint 60 appels, on quitte (rien à faire)
+  if (compteurIA < 30) return;
+
+  // 🔁 Une fois chaque 60 appels (~1 minute si appelé chaque seconde)
+  compteurIA = 0;
+
+  let estNormal = true;
+  let anomalies = [];
+
+  if (consommationActuelle > 10000) {
+    estNormal = false;
+    anomalies.push("la consommation dépasse 10000 Wh");
+  }
+
+  if (temperature > 55 || temperature < 5) {
+    estNormal = false;
+    anomalies.push("la température est anormale");
+  }
+
+  if (humidite > 90 || humidite < 10) {
+    estNormal = false;
+    anomalies.push("le taux d'humidité est anormal");
+  }
+
+  if (courant > 20) {
+    estNormal = false;
+    anomalies.push("le courant dépasse 20 ampères");
+  }
+
+  if (tension < 190 || tension > 250) {
+    estNormal = false;
+    anomalies.push("la tension est hors de l'intervalle normal");
+  }
+
+  // 🗣️ Parler uniquement toutes les 60 secondes
+  parler("Consommation actuelle : " + consommationActuelle.toFixed(2) + " watt-heure.");
+
+  if (estNormal) {
+    parler("Analyse IA : les données sont normales. Le système fonctionne correctement.");
+  } else {
+    parler("Attention : des anomalies ont été détectées après l'analyse des données : " + anomalies.join(", ") + ".");
+  }
+}
 
     
 

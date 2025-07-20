@@ -62,7 +62,7 @@ h1, h2 , h3  {
     width: 100px;
     height: 100px; /* Assure que c’est un carré */
     object-fit: cover; /* Remplissage sans déformation */
-    border: 2px solid rgb(4, 8, 251);
+    border: 2px solid rgb(114, 88, 220);
     border-radius: 50%; /* Forme circulaire */
     overflow: hidden; /* Coupe l’image au cercle */
 }
@@ -154,7 +154,7 @@ table {
     border-collapse: collapse;
     margin: 10px auto; /* Réduction de l'espacement vertical */
     font-family: Arial, sans-serif;
-    border: 2px solid rgba(249, 249, 252, 0.975); /* Bordure extérieure corrigée */
+    border: 1px solid rgba(160, 160, 209, 0.975); /* Bordure extérieure corrigée */
 }
 th, td {
     border: 1px solid #b5a9e8;
@@ -193,7 +193,7 @@ th {
 .station {
     width: 28%;
     padding: 15px;
-    border: 2px solid #f7f6fb;
+    border: 1px solid #b5a9e8;
     background-color: #f8f5f5;
     text-align: center;
     border-radius: 4px;

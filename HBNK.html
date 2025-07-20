@@ -13,9 +13,9 @@
 <body>
    <!-- Version desktop -->
    <div class="main-wrapper">
-      <h1 class="hide-on-mobile" style="color: #e4a323;">RESEAU 4.0 DE TRANSPORT ÉLECTRIQUE INTELLIGENT Basée Sur l'IA(AI)  EN R.D.C </h1>
+      <h1 class="hide-on-mobile" style="color: #2343e4;">RESEAU 4.0 DE TRANSPORT ÉLECTRIQUE INTELLIGENT Basée Sur l'IA(AI)  EN R.D.C </h1>
       
-      <h2 class="hide-on-mobile" style="color: #c38c1d;">              @HBNK.AGK                                                      </h2>
+      <h2 class="hide-on-mobile" style="color: #2343e4;">              @HBNK.AGK                                                      </h2>
 
   
   <div class="image-container">
@@ -45,7 +45,7 @@
   <div class="table-wrapper">
   <table>
     <tr class="title-row">
-      <th style="color: rgb(63, 61, 226);"colspan="7">Les Données de la ligne</th>
+      <th style="color: rgb(78, 76, 222);"colspan="7">Les Données de la ligne</th>
     </tr>
     <tr>
       <th style="color: rgb(68, 68, 227);">Courant</th>
@@ -54,7 +54,7 @@
       <th style="color: rgb(71, 71, 231);">PuissanceA</th>
       <th style="color: rgb(74, 74, 232);">Température</th>
       <th style="color: rgb(68, 68, 227);">Humidité</th>
-      <th style="color: rgb(70, 70, 230);">Facteur de puissance (cosρ)</th>
+      <th style="color: rgb(70, 70, 230);"> cosρ</th>
     </tr>
     <tr>
       <td id="COURANT"style="color: orange;">0</td>
@@ -150,6 +150,8 @@
     database.ref("Data/Tension").on("value", (snapshot) => {
       Tension = snapshot.val();
       document.getElementById("DDP").textContent = Tension + " V";
+
+      
       updatePower();
     });
   
@@ -367,56 +369,17 @@ window.desactiverBarumbu = desactiverBarumbu;
 window.activertout = activertout;
 window.desactivertout = desactivertout;
 
-// Fonction pour annoncer périodiquement l'état de tous les départs
-function annoncerEtats() {
-  if (modeSilencieux) return; // Ne pas parler si le mode silencieux est activé
-
-  database.ref("Depars").once("value").then((snapshot) => {
-    const data = snapshot.val();
-
-    const activés = [];
-    const désactivés = [];
-
-    if (data.Depart_GOMBE == 1) {
-      activés.push("la commune de la Gombé");
-    } else {
-      désactivés.push("la commune de la Gombé");
-    }
-
-    if (data.Depart_LIMETE == 1) {
-      activés.push("la commune de Limété ");
-    } else {
-      désactivés.push("la commune de Limété ");
-    }
-
-    if (data.Depart_BARUMBU == 1) {
-      activés.push("la commune de Baroumbou");
-    } else {
-      désactivés.push("la commune de Baroumbou");
-    }
-
-    // Annonce des états
-    if (activés.length === 3) {
-      parler("Tous les départs sont actuellement activés.");
-    } else if (désactivés.length === 3) {
-      parler("Tous les départs sont actuellement désactivés.");
-    } else {
-      if (activés.length > 0) {
-        parler("Les départs activés sont : " + activés.join(", et ") + " seulement.");
-      }
-      if (désactivés.length > 0) {
-        parler("Les départs désactivés sont : " + désactivés.join(", et ") + " seulement.");
-      }
-    }
-
-    // Ensuite, annoncer les mesures et la prédiction
-    annoncerMesuresEtPrediction();
-  });
+// Fonction pour faire parler le système
+function parler(message) {
+  const synthese = window.speechSynthesis;
+  const voix = new SpeechSynthesisUtterance(message);
+  voix.lang = "fr-FR";
+  synthese.speak(voix);
 }
 
-// Fonction pour annoncer les mesures + prédiction
+// Fonction principale qui regroupe mesures, prédictions et alertes
 function annoncerMesuresEtPrediction() {
-  const courant = parseFloat(document.getElementById("COURANT").textContent); // ex: 5A
+  const courant = parseFloat(document.getElementById("COURANT").textContent);
   const tension = parseFloat(document.getElementById("DDP").textContent);
   const puissance = parseFloat(document.getElementById("PUISS").textContent);
   const puissanceApparente = parseFloat(document.getElementById("PUISSA").textContent);
@@ -424,17 +387,24 @@ function annoncerMesuresEtPrediction() {
   const humidite = parseFloat(document.getElementById("HUM").textContent);
   const cosPhi = parseFloat(document.getElementById("Cos").textContent);
 
-  // Lecture vocale des mesures
-  const texteMesures =
-  "Voici les mesures actuelles et la prédiction de l'état du système : " +
-  `Le courant est de ${courant} empère${courant > 1 ? "s" : ""}, ` +
-  `la tension est de ${tension} volt${tension > 1 ? "s" : ""}, ` +
-  `la puissance est de ${puissance} watt${puissance > 1 ? "s" : ""}, ` +
-  `la puissance apparente est de ${puissanceApparente} volt-ampère${puissanceApparente > 1 ? "s" : ""}, ` +
-  `la température est de ${temperature} dégré${temperature > 1 ? "s" : ""} Celsius, ` +
-  `l'humidité est de ${humidite} pour cent, ` +
-  `et le facteur de puissance est de ${cosPhi}.`;
+  let texteMesures =
+    "Voici les mesures actuelles et la prédiction de l'état du système : " +
+    `Le courant est de ${courant} empère${courant > 1 ? "s" : ""}, ` +
+    `la tension est de ${tension} volt${tension > 1 ? "s" : ""}, ` +
+    `la puissance est de ${puissance} watt${puissance > 1 ? "s" : ""}, ` +
+    `la puissance apparente est de ${puissanceApparente} volt-ampère${puissanceApparente > 1 ? "s" : ""}, ` +
+    `la température est de ${temperature} degré${temperature > 1 ? "s" : ""} Celsius, ` +
+    `l'humidité est de ${humidite} pour cent, ` +
+    `et le facteur de puissance est de ${cosPhi}.`;
 
+  // Ajout alerte tension faible dans la même annonce
+  if (tension < 140) {
+    texteMesures += " Attention, la tension est très faible et inférieure à 140 volts Le système reste désactivé.";
+    database.ref("Depars/Depart_TOUT").set(0);
+    desactivertout(); // Désactivation globale
+  }
+
+  // Annonce des mesures
   parler(texteMesures);
 
   // Analyse simple pour prédiction
@@ -445,28 +415,57 @@ function annoncerMesuresEtPrediction() {
     humidite >= 10 && humidite <= 80 &&
     cosPhi >= 0.7 && cosPhi <= 1.0;
 
+  // Annonce unique selon la prédiction
   if (estNormal) {
-    parler("Après l'analyse de données, la prédiction montre que le fonctionnement est normal.");
+    parler("Analyse IA : les données sont normales. Le système fonctionne correctement.");
   } else {
-    parler("Attention.; Selon la prédiction ; des anomalies ont été détectées Apres l'analyse de données .");
+    parler("Attention. Selon la prédiction, des anomalies ont été détectées après l'analyse des données.");
   }
 }
 
-// Fonction pour faire parler le système
-function parler(message) {
-  const synthese = window.speechSynthesis;
-  const voix = new SpeechSynthesisUtterance(message);
-  voix.lang = "fr-FR";
-  synthese.speak(voix);
+// Exécution toutes les 2 minutes (120 000 ms)
+setInterval(annoncerMesuresEtPrediction, 50000);
+ 
+  
+    
+
+    // Fonction utilitaire pour générer une valeur flottante aléatoire entre min et max
+function getRandomFloat(min, max) {
+  return Math.random() * (max - min) + min;
 }
 
-// Exécuter toutes les 2 minutes
-setInterval(annoncerEtats, 60000); // 2 minutes
- 
+// Fonction pour calculer et simuler le courant selon les départs activés
+function simulerVariationCourant() {
+  database.ref("Depars").once("value").then((snapshot) => {
+    const data = snapshot.val();
 
+    const actifs = [
+      data.Depart_GOMBE,
+      data.Depart_LIMETE,
+      data.Depart_BARUMBU
+    ];
 
+    const nbActifs = actifs.filter(etat => etat === 1).length;
 
+    let courantSimulé = 0;
 
+    if (nbActifs === 0) {
+      courantSimulé = 0.00;
+    } else if (nbActifs === 1) {
+      courantSimulé = getRandomFloat(4.00, 4.09);
+    } else if (nbActifs === 2) {
+      courantSimulé = getRandomFloat(8.00, 8.18);
+    } else if (nbActifs === 3) {
+      courantSimulé = getRandomFloat(12.00, 12.36);
+    }
+
+    // Mettre à jour Firebase avec la valeur simulée du courant
+    database.ref("Data/Courant").set(parseFloat(courantSimulé.toFixed(2)));
+  });
+}
+
+// Rafraîchir la valeur du courant toutes les 3 secondes
+setInterval(simulerVariationCourant, 1500);
 
 
     
