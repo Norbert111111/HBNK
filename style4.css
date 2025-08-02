@@ -113,6 +113,7 @@ header h3 {
   color: #004488;
 }
 
+
 .card .value {
   font-size: 2rem;
   font-weight: bold;
@@ -160,11 +161,22 @@ header h3 {
   margin-top: 6px;
 }
 
+.line-data {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* ✅ Centre verticalement */
+  align-items: center;     /* ✅ Centre horizontalement */
+  height: 85.5%;
+   /*text-align: center;*/
+}
+
 .line-data ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  width: 100%;
 }
+
 .line-data li {
   margin-bottom: 8px;
   color: #2413e9;
@@ -181,13 +193,16 @@ header h3 {
 
 /* === GRAPHIQUES === */
 .chart-wrapper {
-  flex-grow: 1;
-  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 canvas {
   width: 100% !important;
+  max-width: 600px;
   height: 130px !important;
+  display: block;
 }
 .bottom {
   text-align: center;
@@ -200,7 +215,7 @@ canvas {
   bottom: 0;
   left: 50%; /* Centre par rapport à l'écran */
   transform: translateX(-50%); /*  Décalage négatif de moitié */
-  background-color: #eef2f7;
+  background-color: #ced2dbec;
   padding: 3px 0;
   display: flex;
   justify-content: space-around;
@@ -321,3 +336,5 @@ canvas {
     width: 90%;
   }
 }
+
+

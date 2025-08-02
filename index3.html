@@ -54,7 +54,7 @@
       <div class="card line">
         <h3>Analyse de la consommation Journaliere</h3>
         <div class="chart-wrapper"><canvas id="lineChart"></canvas></div>
-        <p class="bottom">Énergie consommée à chaque Seconde</p>
+       <p class="bottom" style="color: rgb(4, 32, 248); font-weight: bold; font-size: 14.2px;">Énergie consommée à chaque Seconde</p>
       </div>
 
       <!-- Puissance -->
@@ -85,19 +85,20 @@
   <div class="chart-wrapper">
     <canvas id="powerChart"></canvas>
   </div>
+  
 </div> 
 
 
       <!-- Données techniques -->
       <div class="card line-data">
-        <h3>Données de la ligne</h3>
-        <ul>
-          <li id="COURANT">Courant : -- A</li>
-          <li id="DDP">Tension : -- V</li>
-          <li><span>Température :</span> <span id="TEMP">-- °C</span></li>
-          <li><span>Humidité :</span> <span id="HUM">-- %</span></li>
-        </ul>
-      </div>
+  <h3>Données de la ligne</h3>
+  <ul>
+    <li id="COURANT">Courant : -- A</li>
+    <li id="DDP">Tension : -- V</li>
+    <li><span>Température :</span> <span id="TEMP">-- °C</span></li>
+    <li><span>Humidité :</span> <span id="HUM">-- %</span></li>
+  </ul>
+</div>
 
     
      
@@ -107,7 +108,7 @@
         <div><p id="TEMP_STATS">⬆ Température : -- °C</p></div>
         <div><p id="HUM_STATS">⬇ Humidité : --%</p></div>
       </div>
-
+       
       
 
     </section>
@@ -277,51 +278,72 @@ const powerChart = new Chart(ctxPowerChart, {
 });
 
 
+// 🔄 Fonction pour gérer et sauvegarder l'historique de la consommation journalière
+function updateHistoriqueConsommation() {
+  // Obtenir la date du jour
+  const nouvelleDate = new Date().toDateString();
 
-   // Mise à jour du titre de la carte historique
-function updateHeaderHistorique() {
-  const header = document.getElementById("header-historique");
+  // Si la date a changé, on enregistre les données du jour précédent
+  if (nouvelleDate !== dateCourante) {
+    historiqueJours.push({
+      date: dateCourante,
+      consommation: consommationWh
+    });
+    if (historiqueJours.length > 30) historiqueJours.shift(); // Conserver les 30 derniers jours
 
-  const endDate = new Date(); // aujourd'hui
-  endDate.setDate(endDate.getDate() - 1); // hier
-  endDate.setHours(0, 0, 0, 0);
+    dateCourante = nouvelleDate;
+    consommationWh = 0;
+    tempsFonctionnementSec = 0;
+    lastKnownConsommation = 0;
 
-  const joursAffiches = [];
-  for (let i = 1; i >= 0; i--) {
-    const jour = new Date(endDate);
-    jour.setDate(endDate.getDate() - i);
-    const jourISO = jour.toISOString().slice(0, 10);
+    consommationHoraire.data = [0, 0, 0, 0, 0, 0];
+    barChart.update();
+  }
 
-    const dataJour = historiqueJours.find(h => h.date.startsWith(jourISO));
-    joursAffiches.push({
-      date: jour,
-      consommation: dataJour ? dataJour.consommation : 0
+  // 🔁 Mise à jour de la consommation du jour dans historiqueJours
+  const existingEntry = historiqueJours.find(h => h.date === dateCourante);
+  if (existingEntry) {
+    existingEntry.consommation = consommationWh;
+  } else {
+    historiqueJours.push({
+      date: dateCourante,
+      consommation: consommationWh
     });
   }
 
-  const lastDate = joursAffiches[joursAffiches.length - 1].date;
-  header.textContent = `Consommation les ${joursAffiches.length} derniers jours (jusqu'au ${lastDate.toLocaleDateString('fr-FR')})`;
+  // 💾 Sauvegarde dans Firebase
+  database.ref("Data/historiqueConsommation").set(historiqueJours);
+
+  // 📊 Mise à jour du mini bar chart
+  updateMiniBarChart();
 }
 
-// Mise à jour graphique historique miniBarChart
+// 📊 Mise à jour du graphique miniBarChart (2 derniers jours)
 function updateMiniBarChart() {
-  const endDate = new Date(); // aujourd'hui
-  endDate.setDate(endDate.getDate() - 1); // hier
+  const endDate = new Date();         // Aujourd’hui
+  endDate.setDate(endDate.getDate() - 1); // Hier
   endDate.setHours(0, 0, 0, 0);
 
   const joursAffiches = [];
+
+  // 🔁 Boucle pour les deux derniers jours (ex: 31 juillet et 1er août)
   for (let i = 1; i >= 0; i--) {
     const jour = new Date(endDate);
     jour.setDate(endDate.getDate() - i);
     const jourISO = jour.toISOString().slice(0, 10);
 
-    const dataJour = historiqueJours.find(h => h.date.startsWith(jourISO));
+    const dataJour = historiqueJours.find(h => {
+      const dateStr = new Date(h.date).toISOString().slice(0, 10);
+      return dateStr === jourISO;
+    });
+
     joursAffiches.push({
       date: jour,
-      consommation: dataJour ? dataJour.consommation : 0
+      consommation: dataJour ? parseFloat(dataJour.consommation) : 0
     });
   }
 
+  // ⬅️➡️ L’ordre ici reste du plus ancien vers le plus récent (pas de .reverse)
   miniBarChart.data.labels = joursAffiches.map(h =>
     h.date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
   );
@@ -334,7 +356,39 @@ function updateMiniBarChart() {
   updateHeaderHistorique();
 }
 
+// 📰 Mise à jour du titre de la carte historique
+function updateHeaderHistorique() {
+  const header = document.getElementById("header-historique");
 
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() - 1); // Hier
+  endDate.setHours(0, 0, 0, 0);
+
+  const joursAffiches = [];
+
+  for (let i = 1; i >= 0; i--) {
+    const jour = new Date(endDate);
+    jour.setDate(endDate.getDate() - i);
+    const jourISO = jour.toISOString().slice(0, 10);
+
+    const dataJour = historiqueJours.find(h => {
+      const dateStr = new Date(h.date).toISOString().slice(0, 10);
+      return dateStr === jourISO;
+    });
+
+    joursAffiches.push({
+      date: jour,
+      consommation: dataJour ? parseFloat(dataJour.consommation) : 0
+    });
+  }
+
+  const premier = joursAffiches[0].date;
+  const dernier = joursAffiches[joursAffiches.length - 1].date;
+
+  // 🖊️ Afficher les deux dates dans l'ordre chronologique
+  header.textContent = `Consommation du ${premier.toLocaleDateString('fr-FR')} au ${dernier.toLocaleDateString('fr-FR')}`;
+}
+// 🔄 Fonction pour gérer et sauvegarder l'historique de la consommation journalière
 
     
 
@@ -429,8 +483,8 @@ dataPowerChart.labels.push(timeLabel);
 dataPowerChart.data.push(puissanceActive.toFixed(2));
 powerChart.update();
 
-      // Calcul pourcentage consommation (max 1000 Wh = 100%)
-      const pourcentage = Math.min(100, (consommationWh / 1000) * 100);
+      // Calcul pourcentage consommation (max 10000 Wh = 100%)
+      const pourcentage = Math.min(100, (consommationWh / 5000) * 100);
       document.querySelector(".consumption p").textContent = pourcentage.toFixed(1) + " %";
       document.querySelector(".total-energy .value").textContent = consommationWh.toFixed(2) + " Wh";
 
@@ -524,7 +578,7 @@ function analyserAvecIA(consommationActuelle, temperature, humidite, courant, te
   compteurIA++;  // Incrément à chaque appel
 
   // Si on n'a pas encore atteint 60 appels, on quitte (rien à faire)
-  if (compteurIA < 30) return;
+  if (compteurIA < 40) return;
 
   // 🔁 Une fois chaque 60 appels (~1 minute si appelé chaque seconde)
   compteurIA = 0;
@@ -566,6 +620,8 @@ function analyserAvecIA(consommationActuelle, temperature, humidite, courant, te
     parler("Attention : des anomalies ont été détectées après l'analyse des données : " + anomalies.join(", ") + ".");
   }
 }
+
+   
 
     
 

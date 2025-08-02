@@ -148,12 +148,13 @@
     });
   
     database.ref("Data/Tension").on("value", (snapshot) => {
-      Tension = snapshot.val();
-      document.getElementById("DDP").textContent = Tension + " V";
+  Tension = snapshot.val();
+  document.getElementById("DDP").textContent = Tension + " V";
 
-      
-      updatePower();
-    });
+  
+
+  updatePower();
+});
   
     database.ref("Data/Courant").on("value", (snapshot) => {
       Courant = snapshot.val();
@@ -314,8 +315,12 @@ function desactivertout() {
   document.querySelectorAll("button.activate").forEach(btn => {
     btn.classList.remove("active");
   });
+   if (Tension > 140) {
+
+   parler("Tous les départs sont désactivés");
+  }
    // Parler lorsque tous les départs sont activés
-  parler("Tous les départs sont désactivés");
+  //parler("Tous les départs sont désactivés");
 }
 
 // Vérification de l'état global de tous les départs
@@ -369,7 +374,9 @@ window.desactiverBarumbu = desactiverBarumbu;
 window.activertout = activertout;
 window.desactivertout = desactivertout;
 
-// Fonction pour faire parler le système
+
+
+// ✅ Fonction pour faire parler le système
 function parler(message) {
   const synthese = window.speechSynthesis;
   const voix = new SpeechSynthesisUtterance(message);
@@ -377,54 +384,117 @@ function parler(message) {
   synthese.speak(voix);
 }
 
-// Fonction principale qui regroupe mesures, prédictions et alertes
+let compteurIA = 0;
+
+// ✅ Fonction principale qui lit les mesures, analyse et parle
 function annoncerMesuresEtPrediction() {
   const courant = parseFloat(document.getElementById("COURANT").textContent);
   const tension = parseFloat(document.getElementById("DDP").textContent);
-  const puissance = parseFloat(document.getElementById("PUISS").textContent);
+  const puissancee = parseFloat(document.getElementById("PUISS").textContent);
   const puissanceApparente = parseFloat(document.getElementById("PUISSA").textContent);
   const temperature = parseFloat(document.getElementById("TEMP").textContent);
   const humidite = parseFloat(document.getElementById("HUM").textContent);
   const cosPhi = parseFloat(document.getElementById("Cos").textContent);
 
+
+  // 🔢 Incrément du compteur pour limiter la fréquence d'annonce
+  compteurIA++;
+  if (compteurIA < 13) return; // Exemple : toutes les 2 minutes si intervalle = 5 sec
+  compteurIA = 0;
+
+  // 🔍 Annonce des mesures actuelles
   let texteMesures =
-    "Voici les mesures actuelles et la prédiction de l'état du système : " +
-    `Le courant est de ${courant} empère${courant > 1 ? "s" : ""}, ` +
-    `la tension est de ${tension} volt${tension > 1 ? "s" : ""}, ` +
-    `la puissance est de ${puissance} watt${puissance > 1 ? "s" : ""}, ` +
-    `la puissance apparente est de ${puissanceApparente} volt-ampère${puissanceApparente > 1 ? "s" : ""}, ` +
-    `la température est de ${temperature} degré${temperature > 1 ? "s" : ""} Celsius, ` +
-    `l'humidité est de ${humidite} pour cent, ` +
-    `et le facteur de puissance est de ${cosPhi}.`;
+    "Voici les mesures actuelles de la prédiction de l'état du système : " +
+    `Le Courant est de  : ${courant} empère${courant > 1 ? "s" : ""}, ` +
+    `La Tension est de : ${tension} volt${tension > 1 ? "s" : ""}, ` +
+    `La Puissance active est de : ${puissancee} watt${puissancee > 1 ? "s" : ""}, ` +
+    `La Puissance apparente est de : ${puissanceApparente} volt-empère${puissanceApparente > 1 ? "s" : ""}, ` +
+    `La Température est de: ${temperature} degré${temperature > 1 ? "s" : ""} Celsius, ` +
+    `L'Humidité est de : ${humidite}%, ` +
+    `et le Facteur de puissance est de : ${cosPhi.toFixed(2)}.`;
 
-  // Ajout alerte tension faible dans la même annonce
-  if (tension < 140) {
-    texteMesures += " Attention, la tension est très faible et inférieure à 140 volts Le système reste désactivé.";
-    database.ref("Depars/Depart_TOUT").set(0);
-    desactivertout(); // Désactivation globale
-  }
-
-  // Annonce des mesures
   parler(texteMesures);
 
-  // Analyse simple pour prédiction
-  const estNormal =
-    courant >= 0 && courant <= 30 &&
-    tension >= 200 && tension <= 250 &&
-    temperature >= 10 && temperature <= 45 &&
-    humidite >= 10 && humidite <= 80 &&
-    cosPhi >= 0.7 && cosPhi <= 1.0;
+  // 📊 Analyse intelligente
+  let estNormal = true;
+  let anomalies = [];
 
-  // Annonce unique selon la prédiction
-  if (estNormal) {
-    parler("Analyse IA : les données sont normales. Le système fonctionne correctement.");
-  } else {
-    parler("Attention. Selon la prédiction, des anomalies ont été détectées après l'analyse des données.");
+  if ( courant > 30) {
+    estNormal = false;
+    anomalies.push("le courant est anormal");
   }
+
+  if (tension < 200 || tension > 250) {
+    estNormal = false;
+    anomalies.push("la tension est hors de la plage normale");
+  }
+
+  if (puissancee > 10000) {
+    estNormal = false;
+    anomalies.push("la puissance dépasse 10 000 watts");
+  }
+
+  if (temperature < 10 || temperature > 45) {
+    estNormal = false;
+    anomalies.push("la température est hors norme");
+  }
+
+  if (humidite < 10 || humidite > 80) {
+    estNormal = false;
+    anomalies.push("le taux d'humidité est critique");
+  }
+
+  if (cosPhi < 0.7 || cosPhi > 1.0) {
+    estNormal = false;
+    anomalies.push("le facteur de puissance est inadéquat");
+  }
+
+  // 🔔 Résultat de l’analyse prédictive
+  if (estNormal) {
+    parler("Analyse de la prédiction IA : toutes les données sont normales. Le système fonctionne correctement.");
+  } else {
+    parler("Attention. Analyse de la prédiction IA : des anomalies ont été détectées apres l'Analyse de données. " + anomalies.join(", ") + ".");
+  }
+
+   // 📣 Annonce vocale de l’état des départs depuis Firebase
+database.ref("Depars").once("value").then((snapshot) => {
+  const data = snapshot.val();
+
+  const etats = {
+    Gombé: data.Depart_GOMBE,
+    Limété: data.Depart_LIMETE,
+    Baroumbou: data.Depart_BARUMBU
+  };
+
+  const activés = Object.entries(etats)
+    .filter(([_, val]) => val == 1)
+    .map(([commune, _]) => commune);
+
+  const désactivés = Object.entries(etats)
+    .filter(([_, val]) => val == 0)
+    .map(([commune, _]) => commune);
+
+  // 🔊 Annoncer les communes activées
+  if (activés.length === 0) {
+    parler("Tous les départs sont désactivés.");
+  } else if (activés.length === 3) {
+    parler("Tous les départs sont activés.");
+  } else {
+    const phraseActivés = activés.map(c => `la commune de ${c}`).join(", ");
+    parler("Départs activés : " + phraseActivés + ".");
+  }
+
+  // 🔊 Annoncer les communes désactivées
+  if (désactivés.length > 0 && désactivés.length < 3) {
+    const phraseDésactivés = désactivés.map(c => `la commune de ${c}`).join(", ");
+    parler("départs désactivés  : " + phraseDésactivés + ".");
+  }
+});
+
 }
 
-// Exécution toutes les 2 minutes (120 000 ms)
-setInterval(annoncerMesuresEtPrediction, 50000);
+// ⏱️ Exécution périodique toutes les 5 secondes
+setInterval(annoncerMesuresEtPrediction, 5000); // Exécute chaque 5 secondes
  
   
     
@@ -465,7 +535,69 @@ function simulerVariationCourant() {
 }
 
 // Rafraîchir la valeur du courant toutes les 3 secondes
-setInterval(simulerVariationCourant, 1500);
+setInterval(simulerVariationCourant, 2000);
+
+
+
+
+
+
+
+
+const db = firebase.database();
+const dataRef = db.ref("Data");
+const tensionRef = dataRef.child("Tension");
+
+let ancienneTension = null;
+let timeoutStagnation = null;
+
+// Fonction pour réinitialiser les données
+function resetDonneesFirebase() {
+  console.warn("⚠️ Tension inchangée pendant 2 minutes. Données réinitialisées.");
+  dataRef.update({
+    Tension: 0,
+    Courant: 0,
+    Temperature: 0,
+    hymidite: 0
+  });
+  timeoutStagnation = null;
+}
+
+// Fonction de surveillance de la tension
+function surveillerVariationTension() {
+  tensionRef.on("value", (snapshot) => {
+    const tensionActuelle = snapshot.val();
+    if (tensionActuelle == null) return;
+
+    // Si la tension change → réinitialiser le timer
+    if (ancienneTension !== null && tensionActuelle !== ancienneTension) {
+      clearTimeout(timeoutStagnation);
+      timeoutStagnation = setTimeout(resetDonneesFirebase, 1 * 60 * 1000); // 2 minutes
+    }
+
+    // Si la tension est stable (y compris 0) → lancer ou maintenir le timer
+    if (ancienneTension === null || tensionActuelle === ancienneTension) {
+      if (!timeoutStagnation) {
+        timeoutStagnation = setTimeout(resetDonneesFirebase, 1 * 60 * 1000); // 2 minutes
+      }
+    }
+
+    ancienneTension = tensionActuelle;
+  });
+}
+
+// Démarrer la surveillance
+surveillerVariationTension();
+
+
+
+setInterval(() => {
+  if (Tension < 140) {
+    console.warn("⚠️ Vérification périodique : tension inférieure à 140V, désactivation des départs.");
+    desactivertout();
+    //parler("Attention. La tension est inférieure à 140 volts. Tous les départs sont désactivés.");
+  }
+}, 5);  // toutes les 5 secondes 
 
 
     
