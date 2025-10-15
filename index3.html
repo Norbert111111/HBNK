@@ -601,7 +601,7 @@ function analyserAvecIA(consommationActuelle, temperature, humidite, courant, te
     anomalies.push("le taux d'humidité est anormal");
   }
 
-  if (courant <  3 ) {
+  if (courant  > 30 ) {
     estNormal = false;
     anomalies.push("le courant et de 0 empères ou dépasse 20 empères");
   }
