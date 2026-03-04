@@ -1,12 +1,16 @@
-const CACHE_NAME = "hbnk-pwa-v1";
+const CACHE_NAME = "hbnk-pwa-v4";
+
 const urlsToCache = [
-  "index.html",
-  "HBNK.html",
-  "index3.html",
-  "style.css",
-  "style2.css",
-  "style3.css",
-  "manifest.json"
+  "/HBNK/",
+  "/HBNK/index.html",
+  "/HBNK/HBNK.html",
+  "/HBNK/index3.html",
+  "/HBNK/style.css",
+  "/HBNK/style2.css",
+  "/HBNK/style3.css",
+  "/HBNK/icon-192.png",
+  "/HBNK/icon-512.png",
+  "/HBNK/manifest.json"
 ];
 
 self.addEventListener("install", event => {
@@ -18,7 +22,7 @@ self.addEventListener("install", event => {
 
 self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+    fetch(event.request)
+      .catch(() => caches.match(event.request))
   );
 });
