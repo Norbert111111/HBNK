@@ -1,11 +1,10 @@
 {
-  "name": "HBN - Electro-Elites Smart Grid",
-  "short_name": "SmartGrid",
+  "name": "HBNK IoT Dashboard",
+  "short_name": "HBNK",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0d6efd",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "icon-192.png",
