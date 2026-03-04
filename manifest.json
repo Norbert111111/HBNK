@@ -1,19 +1,18 @@
 {
   "name": "HBNK IoT Dashboard",
   "short_name": "HBNK",
-  "start_url": "/HBNK/index.html",
-  "scope": "/HBNK/",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0d6efd",
   "icons": [
     {
-      "src": "/HBNK/icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/HBNK/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
