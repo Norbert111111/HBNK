@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard IoT/IA Connecté</title>
 
+      <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d6efd">
+
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="style4.css" />
@@ -622,7 +626,13 @@ function analyserAvecIA(consommationActuelle, temperature, humidite, courant, te
 }
 
    
-
+         if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('Service Worker enregistré', reg))
+          .catch(err => console.log('Erreur SW', err));
+      });
+    }
     
 
 
