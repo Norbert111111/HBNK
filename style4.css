@@ -1,13 +1,11 @@
-/* style.css */
-
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   font-family: 'Segoe UI', sans-serif;
-  background: #e5dbdb; /* ✅ Interface blanche */
-  color: #1a5fb4; /* ✅ Texte bleu profond */
+  background: #e5dbdb;
+  color: #1a5fb4;
   overflow-x: hidden;
 }
 
@@ -26,7 +24,6 @@ body {
   background-color: #e5dbdb;
 }
 
-/* === HEADER === */
 header {
   display: flex;
   flex-wrap: wrap;
@@ -35,19 +32,18 @@ header {
   margin-bottom: 20px;
 }
 
-/* Caché par défaut (desktop) */
 .info-color {
   display: none;
 }
-/* Affiché sur mobile (écrans ≤ 768px) */
+
 @media (max-width: 768px) {
   .info-color {
     display: block;
     margin-top: 10px;
     font-size: 0.95rem;
-    color: #0c08ff;   /* ta couleur bleue */
-    text-align: left; /* commence au début */
-    margin-left: 0;   /* pas de marge à gauche */
+    color: #0c08ff;
+    text-align: left;
+    margin-left: 0;
   }
 }
 
@@ -58,12 +54,13 @@ header {
   border: 3px solid #262dad;
   object-fit: cover;
 }
+
 header h1,
 header h2,
 header p {
   font-size: 1.7rem;
-  margin: 2px 0; /* ✅ Espacement vertical réduit */
-  line-height: 1; /* ✅ Réduction de l'espacement interne */
+  margin: 2px 0;
+  line-height: 1;
 }
 
 header h1 {
@@ -77,16 +74,12 @@ header h2 {
 header p {
   color: #0c08ff;
 }
+
 header h3 {
   color: #0f1aec;
-   font-size: 1.7rem;
+  font-size: 1.7rem;
 }
 
-
-
-
-
-/* === GRILLE PRINCIPALE === */
 .main-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -94,9 +87,8 @@ header h3 {
   width: 100%;
 }
 
-/* === CARTES === */
 .card {
-  background: #f6f7f9; /* fond clair bleu-gris */
+  background: #f6f7f9;
   border-radius: 16px;
   padding: 15px;
   box-shadow: 0 4px 15px rgba(231, 231, 235, 0.968);
@@ -107,12 +99,12 @@ header h3 {
   overflow: hidden;
 }
 
-.card h3, .card h4 {
+.card h3,
+.card h4 {
   margin: 0 0 10px;
   font-size: 1rem;
   color: #004488;
 }
-
 
 .card .value {
   font-size: 2rem;
@@ -164,10 +156,9 @@ header h3 {
 .line-data {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* ✅ Centre verticalement */
-  align-items: center;     /* ✅ Centre horizontalement */
+  justify-content: center;
+  align-items: center;
   height: 85.5%;
-   /*text-align: center;*/
 }
 
 .line-data ul {
@@ -191,7 +182,6 @@ header h3 {
   font-weight: bold;
 }
 
-/* === GRAPHIQUES === */
 .chart-wrapper {
   display: flex;
   justify-content: center;
@@ -204,17 +194,17 @@ canvas {
   height: 130px !important;
   display: block;
 }
+
 .bottom {
   text-align: center;
 }
 
-/* === NAVIGATION BAS FIXE === */
 .bottom-nav {
   width: 40%;
   position: fixed;
   bottom: 0;
-  left: 50%; /* Centre par rapport à l'écran */
-  transform: translateX(-50%); /*  Décalage négatif de moitié */
+  left: 50%;
+  transform: translateX(-50%);
   background-color: #ced2dbec;
   padding: 3px 0;
   display: flex;
@@ -232,9 +222,11 @@ canvas {
   position: relative;
   transition: transform 0.3s ease;
 }
+
 .bottom-nav .nav-item:hover {
   transform: scale(1.2);
 }
+
 .bottom-nav .nav-item.active::before {
   content: '';
   position: absolute;
@@ -258,7 +250,72 @@ canvas {
   max-width: 90%;
 }
 
-/* === RESPONSIVE === */
+/* Historique général */
+.history-section {
+  width: 100%;
+  margin-top: 22px;
+  margin-bottom: 85px;
+  box-sizing: border-box;
+}
+
+.history-section h3 {
+  text-align: center;
+  color: #0f1aec;
+  margin-bottom: 12px;
+}
+
+.history-scroll {
+  width: 100%;
+  max-height: 430px;
+  overflow-x: auto;
+  overflow-y: auto;
+  background: #f6f7f9;
+  border: 1px solid #c7c9eb;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(231, 231, 235, 0.968);
+}
+
+.history-table {
+  width: 100%;
+  min-width: 1350px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.history-table th,
+.history-table td {
+  border: 1px solid #c9cbed;
+  padding: 10px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.history-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #eef0ff;
+  color: #1722c7;
+}
+
+.history-table tbody td {
+  background: #ffffff;
+  color: #173c75;
+}
+
+.history-table .daily-total-row td {
+  background: #fff0c8;
+  color: #1624c5;
+  font-weight: bold;
+  border-top: 3px solid #f5a506;
+}
+
+.history-note {
+  text-align: center;
+  color: #1523e8;
+  font-size: 0.88rem;
+}
+
 @media (max-width: 768px) {
   header h1 {
     font-size: 1.3rem;
@@ -285,54 +342,85 @@ canvas {
   }
 
   .header-container {
-  display: flex;
-  flex-wrap: nowrap;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-}
-
-.profile {
-  flex-shrink: 0;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-}
-
-.header-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex-grow: 1;
-  text-align: center; /* ✅ Centre horizontalement les h1 et h2 */
-}
-
-.header-text h1,
-.header-text h2 {
-  font-size: 1.1rem;
-  line-height: 1.1;
-  margin: 0;
-  padding: 0;
-}
-
-.info-color {
-  margin-top: 10px;
-  font-size: 1.4rem;
-   line-height: 1;
-  color: #0c08ff;
-  text-align: center;
-  margin-left: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.hide-on-mobile {
-    display: none;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
   }
 
+  .profile {
+    flex-shrink: 0;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+  }
+
+  .header-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .header-text h1,
+  .header-text h2 {
+    font-size: 1.1rem;
+    line-height: 1.1;
+    margin: 0;
+    padding: 0;
+  }
+
+  .info-color {
+    margin-top: 10px;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: #0c08ff;
+    text-align: center;
+    margin-left: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hide-on-mobile {
+    display: none;
+  }
 
   .bottom-nav {
     width: 90%;
   }
+
+  .history-scroll {
+    max-height: 360px;
+  }
+
+  .history-table {
+    font-size: 0.82rem;
+  }
+
+  .history-table th,
+  .history-table td {
+    padding: 8px;
+  }
+}
+
+
+.history-table .interval-total-row td {
+  background: #e8f0ff;
+  color: #1026b8;
+  font-weight: bold;
+  border-top: 2px solid #3f51d6;
+}
+
+.history-table .daily-total-row td {
+  background: #fff0c8;
+  color: #1624c5;
+  font-weight: bold;
+  border-top: 3px solid #f5a506;
+}
+
+.history-table .daily-total-row td:nth-child(2) {
+  color: #c66a00;
 }

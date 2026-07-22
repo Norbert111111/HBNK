@@ -17,7 +17,7 @@
 <body>
    <!-- Version desktop -->
    <div class="main-wrapper">
-      <h1 class="hide-on-mobile" style="color: #2343e4;">RESEAU 4.0 DE DISTRIBUTION ÉLECTRIQUE INTELLIGENT Basée Sur l'IA(AI)  EN R.D.C </h1>
+      <h1 class="hide-on-mobile" style="color: #2343e4;">RESEAU 5.0 DE DISTRIBUTION ÉLECTRIQUE INTELLIGENT Basée Sur l'IA(AI)  EN R.D.C </h1>
       
       <h2 class="hide-on-mobile" style="color: #2343e4;">              @HBNK.AGK                                                      </h2>
 
@@ -37,7 +37,7 @@
      <img src="images/logo17.jpg" alt="Logo17" class="image-placeholder" style="height: 100px;">
        <div class="text-block">
          <span>RESEAU DE TRANSPORT ELEC</span>
-        <span>4.0 INTELLIGENT</span>
+        <span>5.0 INTELLIGENT</span>
       </div>
       <h5  style="color: #1408f4;">
     </div>
@@ -49,30 +49,55 @@
   <div class="table-wrapper">
   <table>
     <tr class="title-row">
-      <th style="color: rgb(78, 76, 222);"colspan="7">Les Données du Reseau  Distr 4.0</th>
+      <th style="color: rgb(78, 76, 222);" colspan="8">Les Données du Reseau Distr 5.0</th>
     </tr>
     <tr>
+      <th style="color: rgb(68, 68, 227);">Départs</th>
       <th style="color: rgb(68, 68, 227);">Courant</th>
       <th style="color: rgb(58, 58, 220);">Tension</th>
       <th style="color: rgb(70, 70, 230);">Puissance</th>
       <th style="color: rgb(71, 71, 231);">PuissanceA</th>
       <th style="color: rgb(74, 74, 232);">Température</th>
       <th style="color: rgb(68, 68, 227);">Humidité</th>
-      <th style="color: rgb(70, 70, 230);"> cosρ</th>
+      <th style="color: rgb(70, 70, 230);">cosρ</th>
     </tr>
+
     <tr>
-      <td id="COURANT"style="color: orange;">0</td>
-      <td id="DDP"style="color: orange;">0V</td>
-      <td id="PUISS"style="color: orange;">0W</td>
-      <td id="PUISSA"style="color: orange;">0VA</td>
-      <td id="TEMP"style="color: orange;">0°C</td>
-      <td id="HUM"style="color: orange;">0%</td>
-      <td id="Cos"style="color: orange;">0</td>
+      <td style="color: #2343e4;">Départ GOMBE</td>
+      <td id="COURANT_GOMBE" style="color: orange;">0 A</td>
+      <td id="DDP_GOMBE" style="color: orange;">0 V</td>
+      <td id="PUISS_GOMBE" style="color: orange;">0 W</td>
+      <td id="PUISSA_GOMBE" style="color: orange;">0 VA</td>
+      <td id="TEMP_GOMBE" style="color: orange;">0 °C</td>
+      <td id="HUM_GOMBE" style="color: orange;">0 %</td>
+      <td id="Cos_GOMBE" style="color: orange;">0</td>
+    </tr>
+
+    <tr>
+      <td style="color: #2343e4;">Départ LIMETE</td>
+      <td id="COURANT_LIMETE" style="color: orange;">0 A</td>
+      <td id="DDP_LIMETE" style="color: orange;">0 V</td>
+      <td id="PUISS_LIMETE" style="color: orange;">0 W</td>
+      <td id="PUISSA_LIMETE" style="color: orange;">0 VA</td>
+      <td id="TEMP_LIMETE" style="color: orange;">0 °C</td>
+      <td id="HUM_LIMETE" style="color: orange;">0 %</td>
+      <td id="Cos_LIMETE" style="color: orange;">0</td>
+    </tr>
+
+    <tr>
+      <td style="color: #2343e4;">Départ BARUMBU</td>
+      <td id="COURANT_BARUMBU" style="color: orange;">0 A</td>
+      <td id="DDP_BARUMBU" style="color: orange;">0 V</td>
+      <td id="PUISS_BARUMBU" style="color: orange;">0 W</td>
+      <td id="PUISSA_BARUMBU" style="color: orange;">0 VA</td>
+      <td id="TEMP_BARUMBU" style="color: orange;">0 °C</td>
+      <td id="HUM_BARUMBU" style="color: orange;">0 %</td>
+      <td id="Cos_BARUMBU" style="color: orange;">0</td>
     </tr>
   </table>
   </div>
 
-  
+
   <h3 style="color: rgba(64, 64, 202, 0.988);">CONTROLE ET COMMANDE DES LIGNES DE DISTRIBUTION</h3>
   
   <section class="command-section">
@@ -141,42 +166,130 @@
   
     let Tension = 0;
     let Courant = 0;
-  
+
+    let CourantGombe = 0;
+    let CourantLimete = 0;
+    let CourantBarumbu = 0;
+
+    // Éléments invisibles conservant les anciens identifiants utilisés
+    // par la prédiction IA vocale, sans modifier son code.
+    const donneesIA = document.createElement("div");
+    donneesIA.style.display = "none";
+    donneesIA.innerHTML = `
+      <span id="COURANT">0 A</span>
+      <span id="DDP">0 V</span>
+      <span id="PUISS">0 W</span>
+      <span id="PUISSA">0 VA</span>
+      <span id="TEMP">0 °C</span>
+      <span id="HUM">0 %</span>
+      <span id="Cos">0</span>
+    `;
+    document.body.appendChild(donneesIA);
+
+    function afficherValeurDansLesDeparts(idBase, valeur) {
+      document.getElementById(idBase + "_GOMBE").textContent = valeur;
+      document.getElementById(idBase + "_LIMETE").textContent = valeur;
+      document.getElementById(idBase + "_BARUMBU").textContent = valeur;
+    }
+
     // Mise à jour des données capteurs
     database.ref("Data/Temperature").on("value", (snapshot) => {
-      document.getElementById("TEMP").textContent = snapshot.val() + " °C";
+      const valeur = snapshot.val();
+      afficherValeurDansLesDeparts("TEMP", valeur + " °C");
+      document.getElementById("TEMP").textContent = valeur + " °C";
     });
-  
+
     database.ref("Data/hymidite").on("value", (snapshot) => {
-      document.getElementById("HUM").textContent = snapshot.val() + " %";
+      const valeur = snapshot.val();
+      afficherValeurDansLesDeparts("HUM", valeur + " %");
+      document.getElementById("HUM").textContent = valeur + " %";
     });
-  
+
     database.ref("Data/Tension").on("value", (snapshot) => {
-  Tension = snapshot.val();
-  document.getElementById("DDP").textContent = Tension + " V";
-
-  
-
-  updatePower();
-});
-  
-    database.ref("Data/Courant").on("value", (snapshot) => {
-      Courant = snapshot.val();
-      document.getElementById("COURANT").textContent = Courant + " A";
+      Tension = snapshot.val();
+      afficherValeurDansLesDeparts("DDP", Tension + " V");
+      document.getElementById("DDP").textContent = Tension + " V";
       updatePower();
     });
-  
+
+    database.ref("Data/Courant_GOMBE").on("value", (snapshot) => {
+      CourantGombe = Number(snapshot.val()) || 0;
+      document.getElementById("COURANT_GOMBE").textContent = CourantGombe + " A";
+      updatePower();
+    });
+
+    database.ref("Data/Courant_LIMETE").on("value", (snapshot) => {
+      CourantLimete = Number(snapshot.val()) || 0;
+      document.getElementById("COURANT_LIMETE").textContent = CourantLimete + " A";
+      updatePower();
+    });
+
+    database.ref("Data/Courant_BARUMBU").on("value", (snapshot) => {
+      CourantBarumbu = Number(snapshot.val()) || 0;
+      document.getElementById("COURANT_BARUMBU").textContent = CourantBarumbu + " A";
+      updatePower();
+    });
+
     function updatePower() {
       const F = 0.9;
-      const puissance = Tension * Courant * F;
-      const puissanceA = Tension * Courant;
-  
-      document.getElementById("PUISS").textContent = puissance.toFixed(2) + " W";
-      document.getElementById("PUISSA").textContent = puissanceA.toFixed(2) + " VA";
+
+      const puissanceGombe = Tension * CourantGombe * F;
+      const puissanceAGombe = Tension * CourantGombe;
+
+      const puissanceLimete = Tension * CourantLimete * F;
+      const puissanceALimete = Tension * CourantLimete;
+
+      const puissanceBarumbu = Tension * CourantBarumbu * F;
+      const puissanceABarumbu = Tension * CourantBarumbu;
+
+      document.getElementById("PUISS_GOMBE").textContent = puissanceGombe.toFixed(2) + " W";
+      document.getElementById("PUISSA_GOMBE").textContent = puissanceAGombe.toFixed(2) + " VA";
+      document.getElementById("Cos_GOMBE").textContent = F;
+
+      document.getElementById("PUISS_LIMETE").textContent = puissanceLimete.toFixed(2) + " W";
+      document.getElementById("PUISSA_LIMETE").textContent = puissanceALimete.toFixed(2) + " VA";
+      document.getElementById("Cos_LIMETE").textContent = F;
+
+      document.getElementById("PUISS_BARUMBU").textContent = puissanceBarumbu.toFixed(2) + " W";
+      document.getElementById("PUISSA_BARUMBU").textContent = puissanceABarumbu.toFixed(2) + " VA";
+      document.getElementById("Cos_BARUMBU").textContent = F;
+
+      // La prédiction IA vocale reste inchangée et continue
+      // d'utiliser les anciens identifiants.
+      Courant = Math.max(CourantGombe, CourantLimete, CourantBarumbu);
+
+      let puissanceIA = 0;
+      let puissanceAIA = 0;
+
+      if (Courant === CourantGombe) {
+        puissanceIA = puissanceGombe;
+        puissanceAIA = puissanceAGombe;
+      } else if (Courant === CourantLimete) {
+        puissanceIA = puissanceLimete;
+        puissanceAIA = puissanceALimete;
+      } else {
+        puissanceIA = puissanceBarumbu;
+        puissanceAIA = puissanceABarumbu;
+      }
+
+      document.getElementById("COURANT").textContent = Courant + " A";
+      document.getElementById("PUISS").textContent = puissanceIA.toFixed(2) + " W";
+      document.getElementById("PUISSA").textContent = puissanceAIA.toFixed(2) + " VA";
       document.getElementById("Cos").textContent = F;
-  
-      database.ref("Data/puissance").set(puissance);
-      database.ref("Data/puissanceA").set(puissanceA);
+
+      database.ref("Data/puissance_GOMBE").set(puissanceGombe);
+      database.ref("Data/puissanceA_GOMBE").set(puissanceAGombe);
+
+      database.ref("Data/puissance_LIMETE").set(puissanceLimete);
+      database.ref("Data/puissanceA_LIMETE").set(puissanceALimete);
+
+      database.ref("Data/puissance_BARUMBU").set(puissanceBarumbu);
+      database.ref("Data/puissanceA_BARUMBU").set(puissanceABarumbu);
+
+      // Valeurs historiques conservées pour les autres parties existantes.
+      database.ref("Data/Courant").set(Courant);
+      database.ref("Data/puissance").set(puissanceIA);
+      database.ref("Data/puissanceA").set(puissanceAIA);
     }
       let modeSilencieux = false; // Pour contrôler si on doit parler ou non
 // Fonction de synthèse vocale
@@ -508,33 +621,27 @@ function getRandomFloat(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-// Fonction pour calculer et simuler le courant selon les départs activés
+// Fonction pour calculer et simuler un courant propre à chaque départ
 function simulerVariationCourant() {
   database.ref("Depars").once("value").then((snapshot) => {
-    const data = snapshot.val();
+    const data = snapshot.val() || {};
 
-    const actifs = [
-      data.Depart_GOMBE,
-      data.Depart_LIMETE,
-      data.Depart_BARUMBU
-    ];
+    const courantGombe =
+      data.Depart_GOMBE === 1 ? getRandomFloat(2.00, 2.09) : 0.00;
 
-    const nbActifs = actifs.filter(etat => etat === 1).length;
+    const courantLimete =
+      data.Depart_LIMETE === 1 ? getRandomFloat(2.00, 2.09) : 0.00;
 
-    let courantSimulé = 0;
+    const courantBarumbu =
+      data.Depart_BARUMBU === 1 ? getRandomFloat(2.00, 2.09) : 0.00;
 
-    if (nbActifs === 0) {
-      courantSimulé = 0.00;
-    } else if (nbActifs === 1) {
-      courantSimulé = getRandomFloat(2.00, 2.09);
-    } else if (nbActifs === 2) {
-      courantSimulé = getRandomFloat(4.00, 4.18);
-    } else if (nbActifs === 3) {
-      courantSimulé = getRandomFloat(6.00, 6.36);
-    }
-
-    // Mettre à jour Firebase avec la valeur simulée du courant
-    database.ref("Data/Courant").set(parseFloat(courantSimulé.toFixed(2)));
+    // Chaque départ possède son propre courant.
+    // Les courants ne sont pas additionnés.
+    database.ref("Data").update({
+      Courant_GOMBE: parseFloat(courantGombe.toFixed(2)),
+      Courant_LIMETE: parseFloat(courantLimete.toFixed(2)),
+      Courant_BARUMBU: parseFloat(courantBarumbu.toFixed(2))
+    });
   });
 }
 

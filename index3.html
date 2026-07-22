@@ -26,7 +26,7 @@
    <header class="header-container">
   <img src="images/logo17.jpg" alt="Logo17" class="profile">
   <div class="header-text">
-    <h1>RESEAU 4.0 DE TRANSPORT ÉLECTRIQUE INTELLIGENT</h1>
+    <h1>RESEAU 5.0 DE TRANSPORT ÉLECTRIQUE INTELLIGENT</h1>
    <h2>
   Basée sur l’IoT et l’IA<br>
   <span class="hide-on-mobile" style="color: #3633c6;">
@@ -116,6 +116,39 @@
       
 
     </section>
+
+    <section class="history-section">
+      <h3>Historique journalier des trois départs</h3>
+
+      <div class="history-scroll">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Date / Heure</th>
+              <th>Départ</th>
+              <th>Courant</th>
+              <th>Tension</th>
+              <th>Puissance active</th>
+              <th>Puissance apparente</th>
+              <th>Consommation journalière</th>
+              <th>Cos φ</th>
+              <th>Température</th>
+              <th>Humidité</th>
+            </tr>
+          </thead>
+
+          <tbody id="historiqueBody">
+            <tr>
+              <td colspan="10">Chargement de l’historique...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="history-note">
+        Les anciennes valeurs sont conservées pendant une année puis supprimées automatiquement.
+      </p>
+    </section>
   </div>
 
 
@@ -158,14 +191,46 @@
 
     // Variables globales
     let Tension = 0;
+
+    let CourantGombe = 0;
+    let CourantLimete = 0;
+    let CourantBarumbu = 0;
     let Courant = 0;
+
+    let puissanceActiveGombe = 0;
+    let puissanceActiveLimete = 0;
+    let puissanceActiveBarumbu = 0;
     let puissanceActive = 0;
+
+    let puissanceApparenteGombe = 0;
+    let puissanceApparenteLimete = 0;
+    let puissanceApparenteBarumbu = 0;
+    let puissanceApparente = 0;
+
+    let consommationGombeWh = 0;
+    let consommationLimeteWh = 0;
+    let consommationBarumbuWh = 0;
     let consommationWh = 0;
+
     let tempsFonctionnementSec = 0;
     let dateCourante = new Date().toDateString();
     let lastKnownConsommation = 0;
     let isDataLoaded = false;
     let historiqueJours = [];
+
+    let temperatureActuelle = 0;
+    let humiditeActuelle = 0;
+
+    const FACTEUR_PUISSANCE = 0.9;
+    const DUREE_HISTORIQUE_MS = 365 * 24 * 60 * 60 * 1000;
+    const INTERVALLES_HISTORIQUE = [
+      { nom: "00h-06h", debut: 0, fin: 6 },
+      { nom: "06h-12h", debut: 6, fin: 12 },
+      { nom: "12h-18h", debut: 12, fin: 18 },
+      { nom: "18h-24h", debut: 18, fin: 24 }
+    ];
+
+    let dernierIntervalleEnregistre = "";
 
     // Consommation horaire pour barChart
     const consommationHoraire = {
@@ -175,14 +240,14 @@
 
 
     
-    // Initialisation Chart.js - Bar Chart consommation par tranche horaire
+    // Initialisation Chart.js - Bar Chart consommation totale par tranche horaire
     const ctxBarChart = document.getElementById("barChart").getContext("2d");
     const barChart = new Chart(ctxBarChart, {
       type: 'bar',
       data: {
         labels: consommationHoraire.labels,
         datasets: [{
-          label: 'Énergie consommée (Wh)',
+          label: 'Consommation totale (Wh)',
           data: consommationHoraire.data,
           backgroundColor: '#7059f3'
         }]
@@ -396,118 +461,167 @@ function updateHeaderHistorique() {
 
     
 
-    // Mise à jour puissance active, apparente, et facteur de puissance
+    // Mise à jour des puissances des trois départs et des totaux
     function updatePower() {
-      const F = 0.9;
-      const p = Tension * Courant * F;
-      puissanceActive = (isNaN(p) || p < 0) ? 0 : p;
-      const puissanceA = Tension * Courant;
+      Courant = CourantGombe + CourantLimete + CourantBarumbu;
 
-      document.getElementById("PUISS").textContent = puissanceActive.toFixed(2) + " W";
-      document.getElementById("PUISSA").textContent = puissanceA.toFixed(2) + " VA";
-      document.getElementById("Cos").textContent = F;
+      puissanceActiveGombe = Tension * CourantGombe * FACTEUR_PUISSANCE;
+      puissanceActiveLimete = Tension * CourantLimete * FACTEUR_PUISSANCE;
+      puissanceActiveBarumbu = Tension * CourantBarumbu * FACTEUR_PUISSANCE;
+
+      puissanceApparenteGombe = Tension * CourantGombe;
+      puissanceApparenteLimete = Tension * CourantLimete;
+      puissanceApparenteBarumbu = Tension * CourantBarumbu;
+
+      puissanceActive =
+        puissanceActiveGombe +
+        puissanceActiveLimete +
+        puissanceActiveBarumbu;
+
+      puissanceApparente =
+        puissanceApparenteGombe +
+        puissanceApparenteLimete +
+        puissanceApparenteBarumbu;
+
+      if (isNaN(puissanceActive) || puissanceActive < 0) {
+        puissanceActive = 0;
+      }
+
+      if (isNaN(puissanceApparente) || puissanceApparente < 0) {
+        puissanceApparente = 0;
+      }
+
+      document.getElementById("PUISS").textContent =
+        puissanceActive.toFixed(2) + " W";
+
+      document.getElementById("PUISSA").textContent =
+        puissanceApparente.toFixed(2) + " VA";
+
+      document.getElementById("Cos").textContent = FACTEUR_PUISSANCE;
+
+      document.getElementById("COURANT").textContent =
+        "Courant total : " + Courant.toFixed(2) + " A";
 
       database.ref("Data/puissance").set(puissanceActive);
-      database.ref("Data/puissanceA").set(puissanceA);
+      database.ref("Data/puissanceA").set(puissanceApparente);
+      database.ref("Data/Courant").set(Courant);
+
+      database.ref("Data/puissance_GOMBE").set(puissanceActiveGombe);
+      database.ref("Data/puissance_LIMETE").set(puissanceActiveLimete);
+      database.ref("Data/puissance_BARUMBU").set(puissanceActiveBarumbu);
+
+      database.ref("Data/puissanceA_GOMBE").set(puissanceApparenteGombe);
+      database.ref("Data/puissanceA_LIMETE").set(puissanceApparenteLimete);
+      database.ref("Data/puissanceA_BARUMBU").set(puissanceApparenteBarumbu);
     }
 
-    // Mise à jour consommation avec conservation de la dernière valeur si puissance = 0
+    // Mise à jour de la consommation totale et de chaque départ
     function updateConsommation() {
       const nouvelleDate = new Date().toDateString();
 
       // Réinitialisation journalière si changement de jour
       if (nouvelleDate !== dateCourante) {
+        enregistrerTotauxFinDeJournee(dateCourante);
+
         historiqueJours.push({
           date: dateCourante,
-          consommation: consommationWh
+          consommation: consommationWh,
+          consommationGombeWh: consommationGombeWh,
+          consommationLimeteWh: consommationLimeteWh,
+          consommationBarumbuWh: consommationBarumbuWh
         });
-        if (historiqueJours.length > 30) historiqueJours.shift();
+
+        if (historiqueJours.length > 365) {
+          historiqueJours = historiqueJours.slice(-365);
+        }
+
         database.ref("Data/historiqueConsommation").set(historiqueJours);
+
+        consommationGombeWh = 0;
+        consommationLimeteWh = 0;
+        consommationBarumbuWh = 0;
         consommationWh = 0;
         tempsFonctionnementSec = 0;
         dateCourante = nouvelleDate;
         lastKnownConsommation = 0;
-        updateMiniBarChart();
+
         consommationHoraire.data = [0, 0, 0, 0, 0, 0];
         barChart.update();
+        updateMiniBarChart();
       }
-if (puissanceActive > 0) {
-  tempsFonctionnementSec++;
-  consommationWh = (puissanceActive * tempsFonctionnementSec) / 3600;
-  lastKnownConsommation = consommationWh;
 
-  const now = new Date();
-  const tranche = Math.floor(now.getHours() / 4);
-  consommationHoraire.data[tranche] += puissanceActive / 3600;
+      tempsFonctionnementSec++;
 
-  // Mise à jour visuelle du graphique
-  barChart.data.datasets[0].data = consommationHoraire.data.map(v => parseFloat(v.toFixed(2)));
-  barChart.update();
+      consommationGombeWh += puissanceActiveGombe / 3600;
+      consommationLimeteWh += puissanceActiveLimete / 3600;
+      consommationBarumbuWh += puissanceActiveBarumbu / 3600;
 
-  // 🔁 Sauvegarde dans Firebase pour persistance après redémarrage
-  database.ref("Data/consommationHoraire").set(consommationHoraire.data);
-} else {
-  consommationWh = lastKnownConsommation || consommationWh;
-}
+      consommationWh =
+        consommationGombeWh +
+        consommationLimeteWh +
+        consommationBarumbuWh;
 
-      // Mise à jour consommation horaire (en Wh)
+      if (puissanceActive > 0) {
+        lastKnownConsommation = consommationWh;
+      } else {
+        consommationWh = lastKnownConsommation || consommationWh;
+      }
+
       const now = new Date();
-      const heureActuelle = now.getHours();
-      const trancheIndex = Math.floor(heureActuelle / 4); // 6 tranches de 4h
+      const trancheIndex = Math.floor(now.getHours() / 4);
+      consommationHoraire.data[trancheIndex] += puissanceActive / 3600;
 
-      const consoTranche = puissanceActive / 3600; // Wh par seconde
-      consommationHoraire.data[trancheIndex] += consoTranche;
-
+      barChart.data.datasets[0].data =
+        consommationHoraire.data.map(val => Number(val.toFixed(2)));
+      barChart.update();
 
       analyserAvecIA(
-  consommationWh,
-  parseFloat(document.getElementById("TEMP").textContent),
-  parseFloat(document.getElementById("HUM").textContent),
-  Courant,
-  Tension
-);
+        consommationWh,
+        parseFloat(document.getElementById("TEMP").textContent),
+        parseFloat(document.getElementById("HUM").textContent),
+        Courant,
+        Tension
+      );
 
-    // Mise à jour visuelle du graphique
-     barChart.data.datasets[0].data = consommationHoraire.data.map(val => val.toFixed(2));
-     barChart.update();
+      // Graphique puissance active totale
+      const timeLabel = now.toLocaleTimeString();
+      if (dataPowerChart.labels.length >= 30) {
+        dataPowerChart.labels.shift();
+        dataPowerChart.data.shift();
+      }
+      dataPowerChart.labels.push(timeLabel);
+      dataPowerChart.data.push(Number(puissanceActive.toFixed(2)));
+      powerChart.update();
 
-     document.querySelector(".consumption p").textContent =
-  ((consommationWh / 1000) * 100).toFixed(1) + " %";
-
-      
-
-
-      // Ajout dans le graphique Puissance active vs Temps
-const timeLabel = new Date().toLocaleTimeString();
-if (dataPowerChart.labels.length >= 30) {
-  dataPowerChart.labels.shift();
-  dataPowerChart.data.shift();
-}
-dataPowerChart.labels.push(timeLabel);
-dataPowerChart.data.push(puissanceActive.toFixed(2));
-powerChart.update();
-
-      // Calcul pourcentage consommation (max 10000 Wh = 100%)
       const pourcentage = Math.min(100, (consommationWh / 5000) * 100);
-      document.querySelector(".consumption p").textContent = pourcentage.toFixed(1) + " %";
-      document.querySelector(".total-energy .value").textContent = consommationWh.toFixed(2) + " Wh";
+      document.querySelector(".consumption p").textContent =
+        pourcentage.toFixed(1) + " %";
 
-      // Mise à jour graphique consommation temps réel (lineChart)
+      document.querySelector(".total-energy .value").textContent =
+        consommationWh.toFixed(2) + " Wh";
+
+      // Graphique consommation journalière totale
       const nowLabel = now.toLocaleTimeString();
       if (dataLineChart.labels.length >= 20) {
         dataLineChart.labels.shift();
         dataLineChart.data.shift();
       }
       dataLineChart.labels.push(nowLabel);
-      dataLineChart.data.push(consommationWh.toFixed(2));
+      dataLineChart.data.push(Number(consommationWh.toFixed(2)));
       lineChart.update();
 
-      // Sauvegarde dans Firebase
       database.ref("Data/consommationJour").set({
         consommationWh: consommationWh,
+        consommationGombeWh: consommationGombeWh,
+        consommationLimeteWh: consommationLimeteWh,
+        consommationBarumbuWh: consommationBarumbuWh,
         tempsFonctionnementSec: tempsFonctionnementSec,
         dateCourante: dateCourante
       });
+
+      database.ref("Data/consommationHoraire").set(consommationHoraire.data);
+
+      enregistrerHistoriqueGeneral();
     }
 
     // Chargement des données historique et consommation au démarrage
@@ -522,8 +636,11 @@ powerChart.update();
     database.ref("Data/consommationJour").once("value", (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        consommationWh = data.consommationWh || 0;
-        tempsFonctionnementSec = data.tempsFonctionnementSec || 0;
+        consommationWh = Number(data.consommationWh) || 0;
+        consommationGombeWh = Number(data.consommationGombeWh) || 0;
+        consommationLimeteWh = Number(data.consommationLimeteWh) || 0;
+        consommationBarumbuWh = Number(data.consommationBarumbuWh) || 0;
+        tempsFonctionnementSec = Number(data.tempsFonctionnementSec) || 0;
         dateCourante = data.dateCourante || new Date().toDateString();
         lastKnownConsommation = consommationWh;
       }
@@ -543,15 +660,19 @@ powerChart.update();
 
     // Mise à jour des données techniques en temps réel
     database.ref("Data/Temperature").on("value", (snap) => {
-      const val = snap.val();
+      const val = Number(snap.val()) || 0;
+      temperatureActuelle = val;
       document.getElementById("TEMP").textContent = val + " °C";
-      document.getElementById("TEMP_STATS").textContent = "🌡️ Température : " + val + " °C";
+      document.getElementById("TEMP_STATS").textContent =
+        "🌡️ Température : " + val + " °C";
     });
 
     database.ref("Data/hymidite").on("value", (snap) => {
-      const val = snap.val();
+      const val = Number(snap.val()) || 0;
+      humiditeActuelle = val;
       document.getElementById("HUM").textContent = val + " %";
-      document.getElementById("HUM_STATS").textContent = "💧 Humidité : " + val + " %";
+      document.getElementById("HUM_STATS").textContent =
+        "💧 Humidité : " + val + " %";
     });
 
     database.ref("Data/Tension").on("value", (snap) => {
@@ -559,12 +680,324 @@ powerChart.update();
       document.getElementById("DDP").textContent = "Tension : " + Tension + " V";
     });
 
-    database.ref("Data/Courant").on("value", (snap) => {
-      Courant = snap.val();
-      document.getElementById("COURANT").textContent = "Courant : " + Courant + " A";
+    database.ref("Data/Courant_GOMBE").on("value", (snap) => {
+      CourantGombe = Number(snap.val()) || 0;
+      updatePower();
+    });
+
+    database.ref("Data/Courant_LIMETE").on("value", (snap) => {
+      CourantLimete = Number(snap.val()) || 0;
+      updatePower();
+    });
+
+    database.ref("Data/Courant_BARUMBU").on("value", (snap) => {
+      CourantBarumbu = Number(snap.val()) || 0;
+      updatePower();
     });
 
     
+
+
+    function cleDateFirebase(date = new Date()) {
+      const annee = date.getFullYear();
+      const mois = String(date.getMonth() + 1).padStart(2, "0");
+      const jour = String(date.getDate()).padStart(2, "0");
+      return `${annee}-${mois}-${jour}`;
+    }
+
+    function obtenirIntervalleActuel(date = new Date()) {
+      const heure = date.getHours();
+
+      return INTERVALLES_HISTORIQUE.find(
+        intervalle => heure >= intervalle.debut && heure < intervalle.fin
+      ) || INTERVALLES_HISTORIQUE[0];
+    }
+
+    function enregistrerHistoriqueGeneral() {
+      const maintenant = new Date();
+      const cleJour = cleDateFirebase(maintenant);
+      const intervalle = obtenirIntervalleActuel(maintenant);
+      const cleIntervalle = intervalle.nom.replace(/[^0-9a-zA-Z]/g, "_");
+      const identifiantIntervalle = `${cleJour}_${cleIntervalle}`;
+
+      // Empêche plusieurs écritures du même intervalle après actualisation ou boucle.
+      if (dernierIntervalleEnregistre === identifiantIntervalle) {
+        return;
+      }
+
+      dernierIntervalleEnregistre = identifiantIntervalle;
+
+      const base = {
+        timestamp: maintenant.getTime(),
+        dateHeure: `${cleJour} ${intervalle.nom}`,
+        intervalle: intervalle.nom,
+        tension: Tension,
+        cosPhi: FACTEUR_PUISSANCE,
+        temperature: temperatureActuelle,
+        humidite: humiditeActuelle
+      };
+
+      const valeurs = {
+        GOMBE: {
+          ...base,
+          depart: "Départ GOMBE",
+          courant: CourantGombe,
+          puissanceActive: puissanceActiveGombe,
+          puissanceApparente: puissanceApparenteGombe,
+          consommationJournaliere: consommationGombeWh,
+          type: "mesure"
+        },
+        LIMETE: {
+          ...base,
+          depart: "Départ LIMETE",
+          courant: CourantLimete,
+          puissanceActive: puissanceActiveLimete,
+          puissanceApparente: puissanceApparenteLimete,
+          consommationJournaliere: consommationLimeteWh,
+          type: "mesure"
+        },
+        BARUMBU: {
+          ...base,
+          depart: "Départ BARUMBU",
+          courant: CourantBarumbu,
+          puissanceActive: puissanceActiveBarumbu,
+          puissanceApparente: puissanceApparenteBarumbu,
+          consommationJournaliere: consommationBarumbuWh,
+          type: "mesure"
+        },
+        TOTAL_GENERAL: {
+          ...base,
+          depart: "TOTAL GÉNÉRAL DE L’INTERVALLE",
+          courant: Courant,
+          puissanceActive: puissanceActive,
+          puissanceApparente: puissanceApparente,
+          consommationJournaliere: consommationWh,
+          type: "total_intervalle"
+        }
+      };
+
+      // Une seule entrée par intervalle. Une réouverture de page remplace la même clé.
+      database
+        .ref(`HistoriqueGeneral/${cleJour}/${cleIntervalle}`)
+        .set(valeurs);
+
+      mettreAJourTotalJournalier(cleJour, maintenant);
+      supprimerHistoriqueAncien();
+    }
+
+    function mettreAJourTotalJournalier(cleJour, maintenant = new Date()) {
+      database.ref(`TotauxJournaliers/${cleJour}`).set({
+        date: cleJour,
+        timestamp: maintenant.getTime(),
+
+        gombe: {
+          consommation: consommationGombeWh,
+          courant: CourantGombe,
+          puissanceActive: puissanceActiveGombe,
+          puissanceApparente: puissanceApparenteGombe
+        },
+
+        limete: {
+          consommation: consommationLimeteWh,
+          courant: CourantLimete,
+          puissanceActive: puissanceActiveLimete,
+          puissanceApparente: puissanceApparenteLimete
+        },
+
+        barumbu: {
+          consommation: consommationBarumbuWh,
+          courant: CourantBarumbu,
+          puissanceActive: puissanceActiveBarumbu,
+          puissanceApparente: puissanceApparenteBarumbu
+        },
+
+        general: {
+          consommation: consommationWh,
+          courant: Courant,
+          puissanceActive: puissanceActive,
+          puissanceApparente: puissanceApparente
+        },
+
+        tension: Tension,
+        cosPhi: FACTEUR_PUISSANCE,
+        temperature: temperatureActuelle,
+        humidite: humiditeActuelle,
+        type: "total_journalier"
+      });
+    }
+
+    function enregistrerTotauxFinDeJournee(dateJour) {
+      const date = new Date(dateJour);
+      const cleJour = cleDateFirebase(date);
+      mettreAJourTotalJournalier(cleJour, new Date());
+    }
+
+    function supprimerHistoriqueAncien() {
+      const limite = Date.now() - DUREE_HISTORIQUE_MS;
+
+      database.ref("HistoriqueGeneral").once("value", (snapshot) => {
+        const suppressions = {};
+
+        snapshot.forEach((jourSnapshot) => {
+          const dateJour = new Date(jourSnapshot.key + "T00:00:00").getTime();
+
+          if (dateJour < limite) {
+            suppressions[jourSnapshot.key] = null;
+          }
+        });
+
+        if (Object.keys(suppressions).length > 0) {
+          database.ref("HistoriqueGeneral").update(suppressions);
+        }
+      });
+
+      database.ref("TotauxJournaliers").once("value", (snapshot) => {
+        const suppressions = {};
+
+        snapshot.forEach((jourSnapshot) => {
+          const dateJour = new Date(jourSnapshot.key + "T00:00:00").getTime();
+
+          if (dateJour < limite) {
+            suppressions[jourSnapshot.key] = null;
+          }
+        });
+
+        if (Object.keys(suppressions).length > 0) {
+          database.ref("TotauxJournaliers").update(suppressions);
+        }
+      });
+    }
+
+    function ajouterLigneTotal(lignes, total, depart, valeurs) {
+      lignes.push({
+        timestamp: Number(total.timestamp) || 0,
+        dateHeure: total.date || "--",
+        depart: depart,
+        courant: Number(valeurs.courant) || 0,
+        tension: Number(total.tension) || 0,
+        puissanceActive: Number(valeurs.puissanceActive) || 0,
+        puissanceApparente: Number(valeurs.puissanceApparente) || 0,
+        consommationJournaliere: Number(valeurs.consommation) || 0,
+        cosPhi: Number(total.cosPhi) || FACTEUR_PUISSANCE,
+        temperature: Number(total.temperature) || 0,
+        humidite: Number(total.humidite) || 0,
+        type: "total_journalier"
+      });
+    }
+
+    function chargerHistoriqueGeneral() {
+      Promise.all([
+        database.ref("HistoriqueGeneral").limitToLast(7).once("value"),
+        database.ref("TotauxJournaliers").limitToLast(7).once("value")
+      ]).then(([mesuresSnapshot, totauxSnapshot]) => {
+        const lignes = [];
+
+        mesuresSnapshot.forEach((jourSnapshot) => {
+          jourSnapshot.forEach((intervalleSnapshot) => {
+            const groupe = intervalleSnapshot.val() || {};
+
+            ["GOMBE", "LIMETE", "BARUMBU", "TOTAL_GENERAL"].forEach((depart) => {
+              if (groupe[depart]) {
+                lignes.push(groupe[depart]);
+              }
+            });
+          });
+        });
+
+        totauxSnapshot.forEach((totalSnapshot) => {
+          const total = totalSnapshot.val() || {};
+
+          ajouterLigneTotal(
+            lignes,
+            total,
+            "TOTAL JOURNALIER GOMBE",
+            total.gombe || {}
+          );
+
+          ajouterLigneTotal(
+            lignes,
+            total,
+            "TOTAL JOURNALIER LIMETE",
+            total.limete || {}
+          );
+
+          ajouterLigneTotal(
+            lignes,
+            total,
+            "TOTAL JOURNALIER BARUMBU",
+            total.barumbu || {}
+          );
+
+          ajouterLigneTotal(
+            lignes,
+            total,
+            "TOTAL JOURNALIER GÉNÉRAL",
+            total.general || {}
+          );
+        });
+
+        lignes.sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
+        afficherHistoriqueGeneral(lignes.slice(0, 300));
+      });
+    }
+
+    function afficherHistoriqueGeneral(lignes) {
+      const tbody = document.getElementById("historiqueBody");
+      tbody.innerHTML = "";
+
+      if (!lignes.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="10">Aucune ancienne valeur enregistrée.</td></tr>';
+        return;
+      }
+
+      lignes.forEach((ligne) => {
+        const tr = document.createElement("tr");
+
+        if (ligne.type === "total_journalier") {
+          tr.classList.add("daily-total-row");
+        }
+
+        if (ligne.type === "total_intervalle") {
+          tr.classList.add("interval-total-row");
+        }
+
+        tr.innerHTML = `
+          <td>${ligne.dateHeure || "--"}</td>
+          <td>${ligne.depart || "--"}</td>
+          <td>${Number(ligne.courant || 0).toFixed(2)} A</td>
+          <td>${Number(ligne.tension || 0).toFixed(2)} V</td>
+          <td>${Number(ligne.puissanceActive || 0).toFixed(2)} W</td>
+          <td>${Number(ligne.puissanceApparente || 0).toFixed(2)} VA</td>
+          <td>${Number(ligne.consommationJournaliere || 0).toFixed(2)} Wh</td>
+          <td>${Number(ligne.cosPhi || 0).toFixed(2)}</td>
+          <td>${Number(ligne.temperature || 0).toFixed(2)} °C</td>
+          <td>${Number(ligne.humidite || 0).toFixed(2)} %</td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Vérifie l'intervalle actuel enregistré dans Firebase.
+    function initialiserIntervalleHistorique() {
+      const maintenant = new Date();
+      const cleJour = cleDateFirebase(maintenant);
+      const intervalle = obtenirIntervalleActuel(maintenant);
+      const cleIntervalle = intervalle.nom.replace(/[^0-9a-zA-Z]/g, "_");
+
+      database
+        .ref(`HistoriqueGeneral/${cleJour}/${cleIntervalle}`)
+        .once("value", (snapshot) => {
+          if (snapshot.exists()) {
+            dernierIntervalleEnregistre = `${cleJour}_${cleIntervalle}`;
+          }
+        });
+    }
+
+    initialiserIntervalleHistorique();
+    chargerHistoriqueGeneral();
+    setInterval(chargerHistoriqueGeneral, 60000);
 
     // Démarrage de la boucle de mise à jour après chargement des données
     function startUpdateLoop() {
